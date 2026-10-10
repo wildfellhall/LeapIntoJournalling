@@ -1,6 +1,6 @@
 # Leap Into Journalling
 
-A browser-based journal for writing, voice, and video, with on-device emotion estimates, editable emotion labels, connected-entry graphs, and downloadable insights reports. Journal entries and recordings are stored locally in your browser.
+A browser-based journal for writing, voice, and video, with on-device emotion estimates, editable emotion labels, connected-entry graphs, and downloadable insights reports. 
 
 ## Screenshots
 
@@ -36,21 +36,6 @@ npx playwright test # With the dev server running; uses installed Google Chrome
 Browser tests use synthetic camera/microphone input and isolated browser profiles. They never open your real camera or microphone. For another Chromium install, change `launchOptions.channel` in `playwright.config.ts`.
 
 The latest implementation passed 55 unit tests, 23 browser tests, and the production build. Seven browser checks also passed against the compiled static site. These checks verify application behavior; model accuracy and its limitations are documented in the [evaluation notes](docs/multimodal-evaluation.md).
-
-## Vercel deployment
-
-The repository is configured for a static Vite deployment through [`vercel.json`](vercel.json):
-
-| Setting | Value |
-| --- | --- |
-| Node.js | 22.x |
-| Install command | `npm ci` |
-| Build command | `npm run build` |
-| Output directory | `dist` |
-
-No API keys, server functions, Python environment, or model training are required for deployment. The existing text weights ship with the app, and the camera models are copied from the installed dependency during the build and loaded when camera analysis is enabled. Experimental model weights and evaluation datasets are excluded from the production output.
-
-Localhost and a deployed site have separate browser storage. Use **Settings & your data** to export a backup and restore it on the other site.
 
 ## Included
 
