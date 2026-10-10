@@ -31,6 +31,7 @@ import { Insights } from "./components/Insights";
 import { Connections } from "./components/Connections";
 import { EntryCard } from "./components/EntryCard";
 import { Modal } from "./components/Modal";
+import { StickerLayer } from "./components/Stickers";
 import {
   JournalIllustration,
   MoodFace,
@@ -55,6 +56,8 @@ import {
 } from "./lib/storage";
 import { demoEntries } from "./lib/demo";
 import { nextPrompt } from "./lib/prompts";
+import { analysisMethodLabel } from "./lib/analysis";
+import { emotionDescription } from "./lib/emotions";
 type Page = "home" | "journal" | "connections" | "insights";
 const pageNames: Record<Page, string> = {
   home: "Your space",
@@ -696,8 +699,10 @@ export default function App() {
               your browser’s speech service.
             </li>
             <li>
-              Sentiment uses a small English word lexicon. It can miss nuance,
-              sarcasm, and other languages; your selected mood takes priority.
+              Text emotions use a small English classifier on this device.
+              It estimates joy, sadness, anger, fear, disgust, and surprise;
+              unclear text stays unlabeled. VADER supplies the separate tone
+              score. Your mood check-in takes priority in the mood charts.
             </li>
             <li>
               Voice energy measures loudness, not emotion. We do not infer
@@ -816,18 +821,19 @@ function EntryDetail({
         <blockquote className="detail-prompt">{entry.prompt}</blockquote>
       )}
       <div
-        className={`detail-paper paper-${entry.decoration.paper} font-${entry.decoration.font}`}
+        className={`detail-paper paper-${entry.decoration.paper} font-${entry.decoration.font}${entry.decoration.stickers.length ? " has-stickers" : ""}`}
       >
         <p className={`detail-text highlight-${entry.decoration.highlight}`}>
           {entry.text || "No text or transcript saved."}
         </p>
-        {entry.decoration.stickers.length > 0 && (
-          <div className="detail-stickers">
-            {entry.decoration.stickers.join(" ")}
-          </div>
-        )}
         {entry.decoration.note && (
           <div className="sticky-note">{entry.decoration.note}</div>
+        )}
+        {entry.decoration.stickers.length > 0 && (
+          <>
+            <div className="sticker-space" aria-hidden="true" />
+            <StickerLayer stickers={entry.decoration.stickers} />
+          </>
         )}
       </div>
       <div className="detail-summary">
@@ -846,6 +852,7 @@ function EntryDetail({
       </div>
       <details className="analysis-details">
         <summary>Explore this entry’s signals</summary>
+        <p>Estimated text emotions: <strong>{emotionDescription(entry.analysis)}</strong>.</p>
         <p>
           Text sentiment:{" "}
           <strong>
@@ -855,7 +862,7 @@ function EntryDetail({
                 ? "Leaning negative"
                 : "Mixed or neutral"}
           </strong>
-          . Local English lexicon estimate.{" "}
+          . {analysisMethodLabel(entry.analysis)}.{" "}
           {entry.mood
             ? "Your own mood check-in takes priority."
             : "Add a mood in your next entry for a personal check-in."}

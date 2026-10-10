@@ -1,0 +1,110 @@
+{
+  "version": "goemotions-linear-1",
+  "dataset": "Google Research GoEmotions, official Ekman mapping",
+  "revision": "2adf640a14f11025ae5a9d0ec493b78530d276d3",
+  "trainExamples": 43410,
+  "validationExamples": 5426,
+  "testExamples": 5427,
+  "features": 12000,
+  "bytes": 596774,
+  "gzipBytes": 220746,
+  "thresholds": {
+    "anger": 0.88,
+    "disgust": 0.64,
+    "fear": 0.38,
+    "joy": 0.63,
+    "sadness": 0.48,
+    "surprise": 0.76,
+    "neutral": 0.83
+  },
+  "validation": {
+    "macroF1": 0.3871,
+    "microF1": 0.4857,
+    "perLabel": {
+      "anger": {
+        "precision": 0.7097,
+        "recall": 0.0614,
+        "f1": 0.113
+      },
+      "disgust": {
+        "precision": 0.8077,
+        "recall": 0.2165,
+        "f1": 0.3415
+      },
+      "fear": {
+        "precision": 0.7544,
+        "recall": 0.4095,
+        "f1": 0.5309
+      },
+      "joy": {
+        "precision": 0.8653,
+        "recall": 0.6571,
+        "f1": 0.7469
+      },
+      "sadness": {
+        "precision": 0.732,
+        "recall": 0.3641,
+        "f1": 0.4863
+      },
+      "surprise": {
+        "precision": 0.7027,
+        "recall": 0.1667,
+        "f1": 0.2694
+      },
+      "neutral": {
+        "precision": 0.7095,
+        "recall": 0.1314,
+        "f1": 0.2217
+      }
+    }
+  },
+  "test": {
+    "macroF1": 0.3783,
+    "microF1": 0.4737,
+    "perLabel": {
+      "anger": {
+        "precision": 0.9091,
+        "recall": 0.0689,
+        "f1": 0.128
+      },
+      "disgust": {
+        "precision": 0.7632,
+        "recall": 0.2358,
+        "f1": 0.3602
+      },
+      "fear": {
+        "precision": 0.7727,
+        "recall": 0.3469,
+        "f1": 0.4789
+      },
+      "joy": {
+        "precision": 0.8596,
+        "recall": 0.6549,
+        "f1": 0.7435
+      },
+      "sadness": {
+        "precision": 0.6904,
+        "recall": 0.3588,
+        "f1": 0.4722
+      },
+      "surprise": {
+        "precision": 0.6736,
+        "recall": 0.1433,
+        "f1": 0.2363
+      },
+      "neutral": {
+        "precision": 0.7446,
+        "recall": 0.1354,
+        "f1": 0.2292
+      }
+    }
+  },
+  "notes": "Held-out Reddit comment metrics, not journal accuracy. Single-segment classifier only; app segmentation/abstention is tested separately. Test data is not used for vocabulary, training, or thresholds.",
+  "sha256": {
+    "train.tsv": "1c254a142be5c00e80d819b9ae1bbd36d94b2eeb8f4b1271846508d57e57d9c5",
+    "dev.tsv": "575489c079c9de1097062a01738f998590d6b7ead66dd1c9fd1d2ba01fd8bc62",
+    "test.tsv": "0587b2dd8b27b97352adbfc3fb083d46005c8946657fdc2b1ca8b1cc7f1f8be4",
+    "emotions.txt": "45c3ef86782d2a4d7fedcd6d8c111aa0d0e94720689bd164fac94fefb4495a89",
+    "ekman_mapping.json": "d6b1fea382917c1685c42e1324a0344106be9390f52a3850ce032656d103a328"
+  }
+}

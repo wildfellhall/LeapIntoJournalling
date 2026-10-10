@@ -7,6 +7,7 @@ import type { InsightsSummary } from "./insights";
 import { localDate, moodInfo, readableDate } from "./types";
 import { downloadBlob } from "./storage";
 import { reportText } from "./reportText";
+import { emotionDescription } from "./emotions";
 
 export interface ReportOptions {
   includeEntries: boolean;
@@ -227,6 +228,20 @@ export function createReportDefinition(
             "No mood check-ins were recorded in this period. Automated estimates are not substituted for self-reported moods here.",
           ),
         ]),
+    {
+      unbreakable: true,
+      stack: [
+        heading("Text emotion estimates"),
+        paragraph(
+          `${summary.emotionEntries} of ${summary.textEntries} entries with saved text have a specific emotion estimate. Labels describe language, not verified feelings. Mixed entries count in each matching category, so totals can exceed the number of entries. Neutral and uncertain text remain unlabeled.`,
+        ),
+        ...(summary.emotionEntries ? [table(
+          ["Estimated emotion", "Entries", "Average words"],
+          summary.emotionDistribution.filter((emotion) => emotion.count).map((emotion) => [emotion.label, emotion.count, emotion.words]),
+          ["*", 80, 100],
+        )] : [paragraph("No clear text emotions were detected in this period.")]),
+      ],
+    },
     heading("Recurring words"),
     paragraph(
       summary.themes.length
@@ -285,7 +300,8 @@ export function createReportDefinition(
         {
           ul: [
             "Selected moods take priority: Joyful +100, Calm +55, Reflective 0, Low -55, Overwhelmed -85. These are app display values, not a validated psychological scale.",
-            "Text estimates use a small English word list with simple negation handling. A score of zero can mean no recognized sentiment words. Context, sarcasm, other languages, and transcript errors can change the meaning.",
+            "Text estimates use VADER, an on-device English sentiment algorithm with rules for negation, intensifiers, capitalization, punctuation, and contrast with 'but'. Sentence scores are averaged by word count. This is an estimate of language tone, not a diagnosis or a probability of an emotion. Zero may reflect mixed signals or no recognized sentiment. Context, sarcasm, other languages, and transcript errors can change the meaning.",
+            "Specific text emotions use a separate compact, on-device classifier trained on English GoEmotions comments, with rules for explicit feeling statements. Categories are joy, sadness, anger, fear, disgust, and surprise. Thresholds favor fewer false positives; some emotions will be missed. Sentence estimates preserve mixed emotions. These are automated language labels, separate from mood check-ins, and have not been validated as a measure of the journal owner's feelings.",
             "Words are counted from saved writing or transcripts. Audio, video, facial-expression estimates, and voice energy are not part of this report or its tone scores.",
             "The report includes only saved entries for this period. Missing days, omitted text, and a small number of entries limit what can be concluded. Patterns do not establish causes or diagnoses.",
           ],
@@ -346,6 +362,7 @@ export function createReportDefinition(
             style: "small",
             margin: [0, 0, 0, 8],
           },
+          { text: `Estimated text emotions: ${emotionDescription(entry.analysis)}`, style: "small", margin: [0, 0, 0, 8] },
         ],
         // Keep the title and source label together; long text can continue across pages.
         unbreakable: true,

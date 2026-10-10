@@ -4,6 +4,7 @@ import { analyze, entryScore, related, similarity } from "./analysis";
 import { writingPrompts, spokenPrompts, nextPrompt } from "./prompts";
 import { deleteEntry, getEntries, importEntries, saveEntries } from "./storage";
 import { defaultDecoration, type Entry } from "./types";
+import { createSticker } from "./stickers";
 const entry = (id: string, text: string): Entry => ({
   id,
   title: id,
@@ -83,13 +84,14 @@ describe("durable browser storage", () => {
       expressions: [{ at: 2, scores: { happy: 0.8 } }],
       decoration: {
         ...defaultDecoration,
-        stickers: ["🌼"],
+        stickers: [{ ...createSticker("🌼", 0), x: 0.75, y: 0.2, size: 112 }],
         note: "Remember this",
       },
     };
     await saveEntries([e]);
     const saved = (await getEntries()).find((x) => x.id === e.id)!;
     expect(saved.decoration.note).toBe("Remember this");
+    expect(saved.decoration.stickers).toEqual(e.decoration.stickers);
     expect(saved.expressions).toEqual(e.expressions);
     expect(await saved.recording?.text()).toBe("audio data");
     await deleteEntry(e.id);

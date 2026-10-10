@@ -83,6 +83,27 @@ describe("insights report data", () => {
       ["constructor", 1],
     ]);
   });
+
+  it("summarizes multi-label emotions across modes without changing self-reported moods", () => {
+    const mixed = entry("mixed", "2026-10-10", "I feel happy and grateful. I am sad and lonely.");
+    mixed.mood = "calm";
+    const voice = { ...entry("voice", "2026-10-09", "I am sad and lonely."), mode: "voice" as const };
+    const video = { ...entry("video", "2026-10-09", "I am afraid and nervous."), mode: "video" as const };
+    const unknown = entry("unknown", "2026-10-10", "I filed the document.");
+    const missing = entry("missing", "2026-10-08", "");
+    const summary = summarizeInsights([mixed, voice, video, unknown, missing], "7", now);
+    expect(summary.emotionEntries).toBe(3);
+    expect(summary.textEntries).toBe(4);
+    expect(summary.emotionDistribution.find((emotion) => emotion.id === "sadness")).toMatchObject({ count: 2, words: 8 });
+    expect(summary.emotionDistribution.find((emotion) => emotion.id === "fear")?.count).toBe(1);
+    expect(summary.emotionTimeline[0]).toMatchObject({ sadness: null, joy: null });
+    expect(summary.emotionTimeline[2]).toMatchObject({ sadness: 1, joy: 1, fear: 0 });
+    expect(summary.distribution).toMatchObject([{ id: "calm", count: 1 }]);
+    const report = JSON.stringify(createReportDefinition(summary, { includeEntries: false, note: "" }, now));
+    expect(report).toContain("Text emotion estimates");
+    expect(report).toContain("Sadness");
+    expect(report).not.toContain(mixed.text);
+  });
 });
 
 describe("PDF report content", () => {

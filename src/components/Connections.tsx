@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { type Entry, moods, moodInfo, readableDate } from "../lib/types";
 import { related, similarity } from "../lib/analysis";
+import { emotionDefinitions, emotionDescription, emotionLabels } from "../lib/emotions";
 import { Sprout } from "./Illustrations";
 export function Connections({
   entries,
@@ -23,6 +24,7 @@ export function Connections({
     [selectedId, setSelectedId] = useState(entries[0]?.id || ""),
     [notice, setNotice] = useState(""),
     [zoom, setZoom] = useState(1);
+  const [colorBy, setColorBy] = useState("emotion");
   const selected = entries.find((e) => e.id === selectedId) || entries[0];
   const ranked = useMemo(
     () => (selected ? related(selected, entries) : []),
@@ -60,7 +62,7 @@ export function Connections({
       <div className="page-heading">
         <div>
           <h1>Connections</h1>
-          <p>Compare entries by content and mood.</p>
+          <p>Compare entries by content, emotions, and mood.</p>
         </div>
         <span className="badge">
           <Network size={14} />
@@ -129,6 +131,10 @@ export function Connections({
                 <span className="tiny-tag">
                   {Math.min(30, entries.length)} of {entries.length} entries
                 </span>
+                <select aria-label="Color graph nodes by" value={colorBy} onChange={(event) => setColorBy(event.target.value)}>
+                  <option value="emotion">Text emotion</option>
+                  <option value="mood">Mood check-in</option>
+                </select>
               </div>
               <div className="graph-canvas">
                 <svg
@@ -207,7 +213,7 @@ export function Connections({
                         className="graph-node"
                       >
                         <title>
-                          {entry.title} · {readableDate(entry.date)}
+                          {entry.title} · {readableDate(entry.date)} · Text estimate: {emotionDescription(entry.analysis)}
                         </title>
                         {i === 0 && (
                           <circle cx={x} cy={y} r="42" fill="#e5f5e8" />
@@ -216,7 +222,7 @@ export function Connections({
                           cx={x}
                           cy={y}
                           r={i === 0 ? 29 : 18}
-                          fill={moodInfo(entry.mood)?.color || "#dde7db"}
+                          fill={(colorBy === "emotion" ? emotionLabels(entry.analysis.emotions)[0]?.color : moodInfo(entry.mood)?.color) || "#dde7db"}
                           stroke={i === 0 ? "#446f51" : "#fafbf7"}
                           strokeWidth={i === 0 ? 2 : 4}
                         />
@@ -280,12 +286,13 @@ export function Connections({
                 </div>
               </div>
               <div className="graph-legend">
-                {moods.map((m) => (
+                {(colorBy === "emotion" ? emotionDefinitions : moods).map((m) => (
                   <span key={m.id}>
                     <i style={{ background: m.color }} />
                     {m.label}
                   </span>
                 ))}
+                <span><i style={{ background: "#dde7db" }} />{colorBy === "emotion" ? "No clear estimate" : "No check-in"}</span>
               </div>
             </section>
             <aside className="card related-card">
@@ -294,6 +301,7 @@ export function Connections({
               <p className="subtle">
                 {selected && readableDate(selected.date)}
               </p>
+              <p className="subtle">Text estimate: {selected && emotionDescription(selected.analysis)}</p>
               <button className="text-button" onClick={() => onOpen(selected)}>
                 Read this entry
                 <ArrowRight size={15} />
@@ -316,7 +324,8 @@ export function Connections({
                       <p>
                         {r.shared.length
                           ? `Shared keywords: ${r.shared.slice(0, 3).join(", ")}`
-                          : "A similar emotional tone"}
+                          : "Combined available signals"}
+                        {r.sharedEmotions.length ? ` · Shared text emotions: ${r.sharedEmotions.join(", ")}` : ""}
                         {r.face !== null ? " · expression data included" : ""}
                       </p>
                     </div>
@@ -327,9 +336,10 @@ export function Connections({
                 <p>Add one more entry to discover your first connection.</p>
               )}
               <p className="small-note">
-                Connections combine word overlap (65%) and mood (35%). When both
-                entries have expression estimates, they contribute 10% and mood
-                contributes 25%. Similarity is a guide, not a certainty.
+                Connections combine words (65%) and emotion profiles (35%).
+                When both entries have mood check-ins, those also inform the emotion comparison.
+                Facial estimates contribute 10% when available, leaving 25% for emotions.
+                Missing signals are omitted and weights adjusted. Node colors show the strongest text emotion or your selected mood.
               </p>
             </aside>
           </div>

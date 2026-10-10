@@ -1338,15 +1338,102 @@ button.primary:hover:not(:disabled) {
 .color-option.selected {
   border-color: #8f9c7a;
 }
-.sticker-option {
-  border: 0;
-  background: none;
-  border-radius: 5px;
-  font-size: 24px;
-  padding: 3px;
+.sticker-picker {
+  width: 100%;
 }
-.sticker-option:hover {
+.sticker-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.sticker-categories button {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  padding: 8px 10px;
+  font-size: 11px;
+  color: #62725a;
+}
+.sticker-categories button[aria-pressed="true"] {
+  background: #eaf4e7;
+  border-color: #cddfc5;
+}
+.sticker-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
+  gap: 6px;
+}
+.sticker-option {
+  border: 1px solid #eeeee5;
+  background: #f7f6ef;
+  border-radius: 10px;
+  height: 48px;
+  font-size: 27px;
+  padding: 5px;
+}
+.sticker-option:hover:not(:disabled) {
   background: #eef3e5;
+  border-color: #cddfc5;
+}
+.sticker-picker-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.sticker-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  margin: -2px 0 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: #fffefa;
+  font-size: 11px;
+  color: #62725a;
+}
+.selected-sticker-preview {
+  font-size: 24px;
+}
+.sticker-controls label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.sticker-controls input {
+  width: 100%;
+  min-width: 50px;
+  max-width: 180px;
+  accent-color: #718c5c;
+}
+.sticker-controls output {
+  min-width: 34px;
+  font-variant-numeric: tabular-nums;
+}
+.sticker-controls .text-button {
+  font-size: 11px;
+  padding: 6px 0;
+}
+.sticker-art {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+  filter: drop-shadow(1.5px 0 0 white) drop-shadow(-1.5px 0 0 white)
+    drop-shadow(0 1.5px 0 white) drop-shadow(0 -1.5px 0 white)
+    drop-shadow(0 1px 1px #52604530);
 }
 .note-editor {
   width: 100%;
@@ -1365,6 +1452,7 @@ button.primary:hover:not(:disabled) {
 }
 .journal-paper {
   position: relative;
+  isolation: isolate;
   border: 1px solid #e9e5d7;
   border-radius: 15px;
   background: #fffaf0;
@@ -1485,20 +1573,70 @@ button.primary:hover:not(:disabled) {
   font-size: 9px;
   color: #6f6e60;
 }
-.paper-stickers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 17px 0;
+.sticker-space {
+  height: 100px;
 }
-.paper-stickers button {
+.sticker-layer {
+  position: absolute;
+  inset: 16px;
+  pointer-events: none;
+  z-index: 1;
+}
+.sticker-node {
+  position: absolute;
+  width: var(--sticker-size);
+  height: var(--sticker-size);
+  font-size: calc(var(--sticker-size) * 0.72);
+  border-radius: 10px;
+}
+.sticker-node.selected {
+  outline: 1px dashed #718c5c;
+  z-index: 2;
+}
+.sticker-move,
+.sticker-display {
+  display: block;
+  width: 100%;
+  height: 100%;
   border: 0;
   background: transparent;
-  padding: 3px;
-  font-size: 35px;
+  padding: 0;
+  font-size: inherit;
+  border-radius: inherit;
 }
-.paper-stickers button:hover {
-  opacity: 0.6;
+.sticker-move,
+.sticker-resize {
+  transition: none;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.sticker-move:active:not(:disabled),
+.sticker-resize:active:not(:disabled) {
+  transform: none;
+}
+.sticker-move {
+  cursor: grab;
+}
+.sticker-move:active {
+  cursor: grabbing;
+}
+.sticker-resize {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #8da67c;
+  border-radius: 50%;
+  background: #fff;
+  color: #557343;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: nwse-resize;
 }
 .sticky-note {
   max-width: 235px;
@@ -2035,6 +2173,33 @@ button.primary:hover:not(:disabled) {
   grid-template-columns: 1.5fr 1fr;
   gap: 21px;
 }
+.emotion-timeline {
+  grid-column: 1 / -1;
+}
+.emotion-words-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 18px;
+  font-size: 12px;
+}
+.emotion-words-table th, .emotion-words-table td {
+  padding: 10px 3px;
+  border-bottom: 1px solid #e7eae2;
+  text-align: right;
+}
+.emotion-words-table th:first-child {
+  text-align: left;
+}
+.emotion-words-table tbody th {
+  font-weight: 400;
+}
+.emotion-words-table i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  margin-right: 7px;
+}
 .chart-card {
   padding: 25px 24px 20px;
   min-width: 0;
@@ -2394,6 +2559,8 @@ button.primary:hover:not(:disabled) {
   font-size: 9px;
 }
 .detail-paper {
+  position: relative;
+  isolation: isolate;
   padding: 27px;
   border: 1px solid #e9e7d6;
   border-radius: 13px;
@@ -2406,10 +2573,8 @@ button.primary:hover:not(:disabled) {
   overflow-wrap: anywhere;
   color: #627355;
 }
-.detail-stickers {
-  font-size: 32px;
-  letter-spacing: 7px;
-  margin-top: 20px;
+.detail-paper.has-stickers {
+  min-height: 560px;
 }
 .detail-summary {
   display: flex;

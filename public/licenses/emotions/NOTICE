@@ -1,0 +1,17 @@
+GoEmotions dataset attribution
+
+Source: Google Research, GoEmotions
+https://github.com/google-research/google-research/tree/master/goemotions
+Pinned data revision: 2adf640a14f11025ae5a9d0ec493b78530d276d3
+License: Apache License, Version 2.0 (see LICENSE in this directory).
+
+Citation: Demszky, Dorottya; Movshovitz-Attias, Dana; Ko, Jeongwoo;
+Cowen, Alan; Nemade, Gaurav; Ravi, Sujith (2020).
+GoEmotions: A Dataset of Fine-Grained Emotions. ACL.
+https://aclanthology.org/2020.acl-main.372/
+
+Leap Into Journalling trains its own compact linear classifier on the public
+training split and applies the supplied Ekman label mapping. This is not
+Google's BERT model or a Google-endorsed product. Training data is not included
+in this distribution. The app adds quantization, threshold selection,
+segmentation, abstention, and negation handling; see docs/emotion-model.md.

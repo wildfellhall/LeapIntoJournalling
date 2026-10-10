@@ -1,4 +1,6 @@
 import { type Entry, moods } from "./types";
+import { normalizeStickers, validStoredStickers } from "./stickers";
+import { analyze, upgradeAnalysis } from "./analysis";
 let dbPromise: Promise<IDBDatabase> | undefined;
 function database() {
   return (dbPromise ||= new Promise((resolve, reject) => {
@@ -18,11 +20,20 @@ export async function getEntries(): Promise<Entry[]> {
     const req = db.transaction("entries").objectStore("entries").getAll();
     req.onsuccess = () =>
       resolve(
-        req.result.sort(
-          (a: Entry, b: Entry) =>
-            b.date.localeCompare(a.date) ||
-            b.createdAt.localeCompare(a.createdAt),
-        ),
+        req.result
+          .map((e: Entry) => ({
+            ...e,
+            analysis: upgradeAnalysis(e),
+            decoration: {
+              ...e.decoration,
+              stickers: normalizeStickers(e.decoration.stickers),
+            },
+          }))
+          .sort(
+            (a: Entry, b: Entry) =>
+              b.date.localeCompare(a.date) ||
+              b.createdAt.localeCompare(a.createdAt),
+          ),
       );
     req.onerror = () => reject(req.error);
   });
@@ -64,7 +75,7 @@ export async function exportEntries(entries: Entry[]) {
     [
       JSON.stringify({
         format: "leap-journal",
-        version: 1,
+        version: 2,
         exportedAt: new Date().toISOString(),
         entries: records,
       }),
@@ -128,8 +139,7 @@ function validateEntry(e: Omit<Entry, "recording">) {
     !["cream", "mint", "lavender", "rose"].includes(e.decoration.paper) ||
     !["none", "yellow", "green", "pink"].includes(e.decoration.highlight) ||
     typeof e.decoration.note !== "string" ||
-    !Array.isArray(e.decoration.stickers) ||
-    !e.decoration.stickers.every((s) => typeof s === "string")
+    !validStoredStickers(e.decoration.stickers)
   )
     throw new Error("The backup contains invalid decoration data.");
 }
@@ -139,7 +149,7 @@ export async function importEntries(file: File) {
   const data = JSON.parse(await file.text());
   if (
     data.format !== "leap-journal" ||
-    data.version !== 1 ||
+    ![1, 2].includes(data.version) ||
     !Array.isArray(data.entries) ||
     data.entries.length > 10000
   )
@@ -164,7 +174,17 @@ export async function importEntries(file: File) {
           );
           blob = new Blob([bytes], { type });
         }
-        return { ...rest, demo: false, recording: blob };
+        return {
+          ...rest,
+          // Derive current labels from the original text, not imported scores.
+          analysis: analyze(rest.text),
+          decoration: {
+            ...rest.decoration,
+            stickers: normalizeStickers(rest.decoration.stickers),
+          },
+          demo: false,
+          recording: blob,
+        };
       },
     ),
   );

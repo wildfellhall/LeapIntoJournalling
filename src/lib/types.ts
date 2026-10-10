@@ -1,3 +1,4 @@
+import type { EmotionStatus } from "./emotions";
 export type Mode = "writing" | "video" | "voice";
 export type Mood = "joyful" | "calm" | "reflective" | "low" | "overwhelmed";
 export const moods: {
@@ -34,13 +35,25 @@ export interface Analysis {
   wordCount: number;
   keywords: string[];
   emotions: Record<string, number>;
-  method: "local-lexicon";
+  emotionStatus?: EmotionStatus;
+  polarity?: { positive: number; negative: number; neutral: number };
+  method: "local-lexicon" | "local-vader" | "local-vader-emotion";
+  version?: string;
+}
+export interface Sticker {
+  id: string;
+  emoji: string;
+  // Fractions of the available travel, keeping the whole sticker on the page.
+  x: number;
+  y: number;
+  size: number;
+  rotation: number;
 }
 export interface Decoration {
   font: string;
   paper: string;
   highlight: string;
-  stickers: string[];
+  stickers: Sticker[];
   note: string;
 }
 export interface Entry {

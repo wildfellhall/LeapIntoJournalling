@@ -25,6 +25,7 @@ import {
 import { type Entry, moods, readableDate } from "../lib/types";
 import { summarizeInsights, type InsightsRange } from "../lib/insights";
 import { InsightsReport } from "./InsightsReport";
+import { EmotionInsights } from "./EmotionInsights";
 import { Sprout } from "./Illustrations";
 export function Insights({
   entries,
@@ -136,6 +137,7 @@ export function Insights({
             </div>
           </div>
           <div className="insights-grid">
+            <EmotionInsights summary={summary} />
             <section className="card chart-card">
               <div className="section-title">
                 <div>

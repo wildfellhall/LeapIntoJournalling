@@ -1,5 +1,6 @@
 import { entryScore } from "./analysis";
 import { type Entry, localDate, moods } from "./types";
+import { emotionDefinitions } from "./emotions";
 
 export type InsightsRange = "7" | "30" | "90" | "all";
 export const rangeLabels: Record<InsightsRange, string> = {
@@ -70,6 +71,23 @@ export function summarizeInsights(
     })
     .filter((mood) => mood.count > 0);
   const keywords = new Map<string, number>();
+  const emotionDistribution = emotionDefinitions.map((emotion) => {
+    const matching = filtered.filter((entry) => (entry.analysis.emotions[emotion.id] || 0) > 0);
+    return {
+      ...emotion,
+      count: matching.length,
+      words: matching.length ? Math.round(matching.reduce((sum, entry) => sum + entry.analysis.wordCount, 0) / matching.length) : 0,
+    };
+  });
+  const emotionTimeline = [...days].map(([date, dayEntries]) => ({
+    date,
+    ...Object.fromEntries(emotionDefinitions.map(({ id }) => [
+      id,
+      dayEntries.some((entry) => entry.text.trim())
+        ? dayEntries.filter((entry) => (entry.analysis.emotions[id] || 0) > 0).length
+        : null,
+    ])),
+  }));
   for (const entry of filtered) {
     for (const word of new Set(entry.analysis.keywords.slice(0, 5))) {
       keywords.set(word, (keywords.get(word) || 0) + 1);
@@ -82,6 +100,10 @@ export function summarizeInsights(
     start: range === "all" ? (filtered[0]?.date ?? end) : start,
     end: range === "all" ? (filtered.at(-1)?.date ?? end) : end,
     timeline,
+    emotionDistribution,
+    emotionTimeline,
+    emotionEntries: filtered.filter((entry) => entry.analysis.emotionStatus === "classified").length,
+    textEntries: filtered.filter((entry) => entry.text.trim()).length,
     days: days.size,
     totalWords: filtered.reduce(
       (sum, entry) => sum + entry.analysis.wordCount,

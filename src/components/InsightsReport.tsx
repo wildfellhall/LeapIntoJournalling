@@ -64,7 +64,7 @@ export function InsightsReport({
         </div>
       </div>
       <p className="report-contents">
-        Includes mood check-ins, trends, recurring words, daily values, and an
+        Includes mood check-ins, text emotions, trends, recurring words, daily values, and an
         explanation of how the estimates work.
       </p>
       <label className="report-option">

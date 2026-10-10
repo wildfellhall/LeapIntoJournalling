@@ -22,6 +22,7 @@ import {
   type Entry,
   type Mode,
   type Mood,
+  type Sticker,
   defaultDecoration,
   localDate,
   moods,
@@ -31,6 +32,12 @@ import { nextPrompt } from "../lib/prompts";
 import { useCapture } from "../lib/useCapture";
 import { MoodFace } from "./Illustrations";
 import { Modal } from "./Modal";
+import { StickerControls, StickerLayer, StickerPicker } from "./Stickers";
+import {
+  createSticker,
+  MAX_STICKERS,
+  normalizeStickers,
+} from "../lib/stickers";
 
 interface Draft {
   title: string;
@@ -60,7 +67,15 @@ function loadDraft(mode: Mode): Draft {
       raw.decoration &&
       Array.isArray(raw.decoration.stickers)
     )
-      return { ...fallback, ...raw };
+      return {
+        ...fallback,
+        ...raw,
+        decoration: {
+          ...fallback.decoration,
+          ...raw.decoration,
+          stickers: normalizeStickers(raw.decoration.stickers),
+        },
+      };
   } catch {
     /* Start fresh if a draft cannot be read. */
   }
@@ -96,6 +111,7 @@ export function Editor({
     [confirmLeave, setConfirmLeave] = useState(false),
     [confirmRedo, setConfirmRedo] = useState(false);
   const [recordingUrl, setRecordingUrl] = useState("");
+  const [selectedStickerId, selectSticker] = useState<string | null>(null);
   const savedRef = useRef(false);
   const capture = useCapture(mode, (text) =>
     setDraft((d) => ({ ...d, text: d.text + (d.text ? " " : "") + text })),
@@ -103,6 +119,26 @@ export function Editor({
   const set = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
   const decorate = (patch: Partial<Decoration>) =>
     setDraft((d) => ({ ...d, decoration: { ...d.decoration, ...patch } }));
+  const updateSticker = (sticker: Sticker) =>
+    setDraft((d) => ({
+      ...d,
+      decoration: {
+        ...d.decoration,
+        stickers: d.decoration.stickers.map((s) =>
+          s.id === sticker.id ? sticker : s,
+        ),
+      },
+    }));
+  const removeSticker = (id: string) => {
+    setDraft((d) => ({
+      ...d,
+      decoration: {
+        ...d.decoration,
+        stickers: d.decoration.stickers.filter((s) => s.id !== id),
+      },
+    }));
+    selectSticker(null);
+  };
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
@@ -263,6 +299,8 @@ export function Editor({
               <span className="toolbar-divider" />
               <button
                 className={tool === "highlight" ? "tool active" : "tool"}
+                aria-label="Highlight"
+                aria-expanded={tool === "highlight"}
                 onClick={() => setTool(tool === "highlight" ? "" : "highlight")}
               >
                 <Highlighter size={17} />
@@ -270,6 +308,8 @@ export function Editor({
               </button>
               <button
                 className={tool === "stickers" ? "tool active" : "tool"}
+                aria-label="Stickers"
+                aria-expanded={tool === "stickers"}
                 onClick={() => setTool(tool === "stickers" ? "" : "stickers")}
               >
                 <Flower2 size={17} />
@@ -277,6 +317,8 @@ export function Editor({
               </button>
               <button
                 className={tool === "note" ? "tool active" : "tool"}
+                aria-label="Sticky note"
+                aria-expanded={tool === "note"}
                 onClick={() => {
                   setTool(tool === "note" ? "" : "note");
                 }}
@@ -420,35 +462,21 @@ export function Editor({
                   ))}
                 </>
               ) : tool === "stickers" ? (
-                <>
-                  <span>Decorations</span>
-                  {[
-                    "🌼",
-                    "🌿",
-                    "🍓",
-                    "✨",
-                    "🦋",
-                    "🌷",
-                    "🍋",
-                    "💌",
-                    "🌙",
-                    "🍄",
-                  ].map((s) => (
-                    <button
-                      key={s}
-                      className="sticker-option"
-                      aria-label={`Add ${s} sticker`}
-                      disabled={draft.decoration.stickers.length >= 8}
-                      onClick={() =>
-                        decorate({
-                          stickers: [...draft.decoration.stickers, s],
-                        })
-                      }
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </>
+                <StickerPicker
+                  count={draft.decoration.stickers.length}
+                  onAdd={(emoji) => {
+                    if (draft.decoration.stickers.length >= MAX_STICKERS)
+                      return;
+                    const sticker = createSticker(
+                      emoji,
+                      draft.decoration.stickers.length,
+                    );
+                    decorate({
+                      stickers: [...draft.decoration.stickers, sticker],
+                    });
+                    selectSticker(sticker.id);
+                  }}
+                />
               ) : (
                 <label className="note-editor">
                   A note in the margin
@@ -462,8 +490,21 @@ export function Editor({
               )}
             </div>
           )}
+          {draft.decoration.stickers.length > 0 && (
+            <StickerControls
+              selected={draft.decoration.stickers.find(
+                (s) => s.id === selectedStickerId,
+              )}
+              onChange={updateSticker}
+              onRemove={removeSticker}
+            />
+          )}
           <div
-            className={`journal-paper paper-${draft.decoration.paper} font-${draft.decoration.font}`}
+            className={`journal-paper paper-${draft.decoration.paper} font-${draft.decoration.font}${draft.decoration.stickers.length ? " has-stickers" : ""}`}
+            onPointerDown={(e) => {
+              if (!(e.target as Element).closest(".sticker-node"))
+                selectSticker(null);
+            }}
           >
             <div className="paper-meta">
               <span>
@@ -502,28 +543,22 @@ export function Editor({
               value={draft.text}
               onChange={(e) => set({ text: e.target.value })}
             />
-            {draft.decoration.stickers.length > 0 && (
-              <div className="paper-stickers">
-                {draft.decoration.stickers.map((s, i) => (
-                  <button
-                    key={i}
-                    aria-label={`Remove ${s} sticker`}
-                    onClick={() =>
-                      decorate({
-                        stickers: draft.decoration.stickers.filter(
-                          (_, j) => j !== i,
-                        ),
-                      })
-                    }
-                    style={{ transform: `rotate(${i % 2 ? -9 : 8}deg)` }}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            )}
             {draft.decoration.note && (
               <div className="sticky-note">{draft.decoration.note}</div>
+            )}
+            {draft.decoration.stickers.length > 0 && (
+              <>
+                <div className="sticker-space" aria-hidden="true" />
+                <StickerLayer
+                  stickers={draft.decoration.stickers}
+                  editing={{
+                    selectedId: selectedStickerId,
+                    onSelect: selectSticker,
+                    onChange: updateSticker,
+                    onRemove: removeSticker,
+                  }}
+                />
+              </>
             )}
             <div className="paper-footer">
               <span>

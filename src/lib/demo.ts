@@ -1,4 +1,5 @@
 import { analyze } from "./analysis";
+import { createSticker } from "./stickers";
 import { defaultDecoration, localDate, type Entry, type Mood } from "./types";
 export function demoEntries(): Entry[] {
   const stories: [string, string, Mood, number][] = [
@@ -78,7 +79,7 @@ export function demoEntries(): Entry[] {
       expressions: [],
       decoration: {
         ...defaultDecoration,
-        stickers: i === 0 ? ["🌼"] : [],
+        stickers: i === 0 ? [createSticker("🌼", 0, "demo-flower")] : [],
         note: "",
       },
       demo: true,
