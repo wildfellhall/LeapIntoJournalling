@@ -17,12 +17,14 @@ import {
 import {
   ArrowRight,
   BookOpen,
+  Download,
   Heart,
   Sprout as SproutIcon,
   Type,
 } from "lucide-react";
-import { type Entry, localDate, moods, readableDate } from "../lib/types";
-import { entryScore } from "../lib/analysis";
+import { type Entry, moods, readableDate } from "../lib/types";
+import { summarizeInsights, type InsightsRange } from "../lib/insights";
+import { InsightsReport } from "./InsightsReport";
 import { Sprout } from "./Illustrations";
 export function Insights({
   entries,
@@ -31,82 +33,59 @@ export function Insights({
   entries: Entry[];
   onDemo: () => void;
 }) {
-  const [range, setRange] = useState("30");
-  const filtered = useMemo(() => {
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - Number(range) + 1);
-    return entries
-      .filter((e) => range === "all" || e.date >= localDate(cutoff))
-      .sort((a, b) => a.date.localeCompare(b.date));
-  }, [entries, range]);
-  const days = new Map<string, number[]>();
-  filtered.forEach((e) =>
-    days.set(e.date, [...(days.get(e.date) || []), entryScore(e)]),
+  const [range, setRange] = useState<InsightsRange>("30");
+  const [reportOpen, setReportOpen] = useState(false);
+  const summary = useMemo(
+    () => summarizeInsights(entries, range),
+    [entries, range],
   );
-  const timeline = [...days].map(([date, values]) => ({
-    date: readableDate(date),
-    value: Math.round(
-      (values.reduce((a, b) => a + b, 0) / values.length) * 100,
-    ),
+  const { filtered, distribution, totalWords, checkins, wordMoods, themes } =
+    summary;
+  const timeline = summary.timeline.map((day) => ({
+    ...day,
+    date: readableDate(day.date),
   }));
-  const distribution = moods
-    .map((m) => ({
-      ...m,
-      count: filtered.filter((e) => e.mood === m.id).length,
-    }))
-    .filter((m) => m.count > 0);
-  const totalWords = filtered.reduce((sum, e) => sum + e.analysis.wordCount, 0),
-    checkins = filtered.filter((e) => e.mood).length;
-  const wordMoods = moods
-    .map((m, i) => ({
-      ...m,
-      x: i,
-      words: Math.round(
-        filtered
-          .filter((e) => e.mood === m.id)
-          .reduce((s, e) => s + e.analysis.wordCount, 0) /
-          (filtered.filter((e) => e.mood === m.id).length || 1),
-      ),
-      count: filtered.filter((e) => e.mood === m.id).length,
-    }))
-    .filter((m) => m.count > 0);
   const longest = wordMoods.slice().sort((a, b) => b.words - a.words)[0];
-  const themes = Object.entries(
-    filtered.reduce<Record<string, number>>((acc, e) => {
-      e.analysis.keywords
-        .slice(0, 5)
-        .forEach((k) => (acc[k] = (acc[k] || 0) + 1));
-      return acc;
-    }, Object.create(null)),
-  )
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8);
   return (
     <div className="page-enter">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">GET TO KNOW YOUR INNER WEATHER</span>
-          <h1>A little perspective.</h1>
-          <p>Gentle observations from the days you’ve shared.</p>
+          <h1>Insights</h1>
         </div>
-        <select
-          aria-label="Insights date range"
-          value={range}
-          onChange={(e) => setRange(e.target.value)}
-        >
-          <option value="7">Last 7 days</option>
-          <option value="30">Last 30 days</option>
-          <option value="90">Last 90 days</option>
-          <option value="all">All time</option>
-        </select>
+        <div className="insights-actions">
+          <select
+            aria-label="Insights date range"
+            value={range}
+            onChange={(e) => setRange(e.target.value as InsightsRange)}
+          >
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="all">All time</option>
+          </select>
+          <button
+            className="secondary"
+            onClick={() => setReportOpen(true)}
+            disabled={!filtered.length}
+          >
+            <Download size={16} />
+            Download report
+          </button>
+        </div>
       </div>
+      {reportOpen && (
+        <InsightsReport
+          summary={summary}
+          onClose={() => setReportOpen(false)}
+        />
+      )}
       {!filtered.length ? (
         <div className="card empty-state">
           <Sprout />
           <h2>
             {entries.length
-              ? "A quiet stretch."
-              : "Every little check-in adds up."}
+              ? "No entries in this date range"
+              : "No insights yet"}
           </h2>
           <p>
             {entries.length
@@ -130,18 +109,16 @@ export function Insights({
             <div className="stat-card">
               <span>
                 <BookOpen size={17} />
-                Moments captured
+                Entries
               </span>
               <strong>{filtered.length}</strong>
-              <small>Each one a little act of care</small>
             </div>
             <div className="stat-card">
               <span>
                 <Type size={17} />
-                Words let out
+                Words
               </span>
               <strong>{totalWords.toLocaleString()}</strong>
-              <small>Room made for what’s inside</small>
             </div>
             <div className="stat-card">
               <span>
@@ -149,23 +126,20 @@ export function Insights({
                 Mood check-ins
               </span>
               <strong>{checkins}</strong>
-              <small>In your own words</small>
             </div>
             <div className="stat-card">
               <span>
                 <SproutIcon size={17} />
-                Days you showed up
+                Days with entries
               </span>
-              <strong>{days.size}</strong>
-              <small>At your own pace</small>
+              <strong>{summary.days}</strong>
             </div>
           </div>
           <div className="insights-grid">
             <section className="card chart-card">
               <div className="section-title">
                 <div>
-                  <h3>Your emotional landscape</h3>
-                  <p>Your mood check-ins over time</p>
+                  <h3>Mood over time</h3>
                 </div>
                 <span className="tiny-tag">Daily average</span>
               </div>
@@ -230,13 +204,13 @@ export function Insights({
               </div>
               <p className="small-note">
                 Your selected mood takes priority. Entries without a check-in
-                use an approximate text sentiment score. These are reflections,
+                use an approximate text sentiment score when text is available.
+                Entries without either are left unscored. These are reflections,
                 not clinical measurements.
               </p>
             </section>
             <section className="card chart-card mood-chart">
-              <h3>A mix of feelings</h3>
-              <p>There’s room for every one of them.</p>
+              <h3>Mood distribution</h3>
               {checkins ? (
                 <>
                   <div className="donut-wrap">
@@ -281,13 +255,13 @@ export function Insights({
                 </>
               ) : (
                 <div className="chart-empty">
-                  Add a mood to your next entry to see your mix of feelings.
+                  Add mood check-ins to see their distribution.
                 </div>
               )}
             </section>
             <section className="card chart-card">
-              <h3>When the words flow</h3>
-              <p>Average word count for each feeling</p>
+              <h3>Words by mood</h3>
+              <p>Average word count per entry</p>
               {wordMoods.length ? (
                 <>
                   <div className="chart-wrap short">
@@ -348,21 +322,18 @@ export function Insights({
                   </div>
                   <p className="insight-note">
                     You’ve written the most, on average, when feeling{" "}
-                    <strong>{longest?.label.toLowerCase()}</strong>. A little
-                    thread to be curious about.
+                    <strong>{longest?.label.toLowerCase()}</strong>.
                   </p>
                 </>
               ) : (
                 <div className="chart-empty">
-                  Mood check-ins will help connect your feelings with your
-                  words.
+                  Add mood check-ins to compare word counts.
                 </div>
               )}
             </section>
             <section className="card themes-card">
-              <span className="eyebrow">WHAT’S BEEN ON YOUR MIND</span>
-              <h3>Familiar threads</h3>
-              <p>Words that keep finding their way onto your pages.</p>
+              <h3>Recurring words</h3>
+              <p>Number of entries containing each keyword</p>
               <div className="theme-tags">
                 {themes.length ? (
                   themes.map(([word, n], i) => (
@@ -372,16 +343,8 @@ export function Insights({
                     </span>
                   ))
                 ) : (
-                  <p>Add a few words to see recurring themes.</p>
+                  <p>No keywords available.</p>
                 )}
-              </div>
-              <div className="gentle-note">
-                <Sprout />
-                <p>
-                  Patterns are invitations to notice.
-                  <br />
-                  You’re always more than a chart.
-                </p>
               </div>
             </section>
           </div>

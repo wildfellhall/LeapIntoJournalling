@@ -27,7 +27,7 @@ export function EntryCard({
         <Icon size={16} />
       </div>
       <h3>{entry.title}</h3>
-      <p>{entry.text || "A moment held in your own voice."}</p>
+      <p>{entry.text || "No text or transcript saved."}</p>
       <div className="entry-card-footer">
         {mood ? (
           <span className="mood-label">
@@ -35,7 +35,7 @@ export function EntryCard({
             {mood.label}
           </span>
         ) : (
-          <span className="subtle">A moment for you</span>
+          <span className="subtle">No mood selected</span>
         )}
         <ArrowUpRight size={18} />
       </div>

@@ -41,15 +41,6 @@ export function JournalIllustration() {
           fill="#dfbbcf"
           opacity=".85"
         />
-        <text x="49" y="64" fontFamily="Caveat" fontSize="27" fill="#43684d">
-          dear little life,
-        </text>
-        <text x="49" y="96" fontFamily="Caveat" fontSize="24" fill="#638363">
-          there is room
-        </text>
-        <text x="49" y="126" fontFamily="Caveat" fontSize="24" fill="#638363">
-          for all of you.
-        </text>
         <path
           d="m164 165 11-13 7 16 17 2-12 12 2 17-15-8-15 8 2-17-12-12Z"
           fill="#f2cd78"

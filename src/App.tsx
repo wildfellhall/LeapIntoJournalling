@@ -5,7 +5,6 @@ import {
   BookOpen,
   CalendarDays,
   Check,
-  ChevronRight,
   CircleHelp,
   Heart,
   LayoutGrid,
@@ -67,28 +66,24 @@ const modes: {
   id: Mode;
   title: string;
   description: string;
-  tag: string;
   Icon: typeof PenLine;
 }[] = [
   {
     id: "writing",
-    title: "Put pen to page",
-    description: "Let your thoughts find their own rhythm.",
-    tag: "Writing journal",
+    title: "Writing journal",
+    description: "Write and customize an entry.",
     Icon: PenLine,
   },
   {
     id: "video",
-    title: "Show up as you are",
-    description: "Your story, your expressions, your way.",
-    tag: "Video journal",
+    title: "Video journal",
+    description: "Record video with an optional transcript.",
     Icon: Video,
   },
   {
     id: "voice",
-    title: "Say it out loud",
-    description: "Sometimes it feels better to just talk.",
-    tag: "Voice memo",
+    title: "Voice memo",
+    description: "Record audio with an optional transcript.",
     Icon: Mic,
   },
 ];
@@ -152,7 +147,7 @@ export default function App() {
     await refresh();
     setEditor(null);
     setPage("journal");
-    setToast("A little piece of your day, safely kept.");
+    setToast("Entry saved.");
     setMood(null);
   }
   const totalWords = shown.reduce((s, e) => s + e.analysis.wordCount, 0),
@@ -250,57 +245,46 @@ export default function App() {
               </button>
             ))}
           </nav>
-          <div className="header-actions">
-            <button
-              className="header-new"
-              disabled={!!editor}
-              onClick={() => setModePicker(true)}
-            >
-              <Plus size={18} />
-              <span>New entry</span>
-            </button>
-            <button
-              className="icon-button header-utility"
-              aria-label="Settings & your data"
-              title="Settings & your data"
-              disabled={!!editor}
-              onClick={() => setSettings(true)}
-            >
-              <Settings2 size={18} />
-            </button>
-            <button
-              className="icon-button header-utility"
-              aria-label="A little guidance"
-              title="A little guidance"
-              onClick={() => setHelp(true)}
-            >
-              <CircleHelp size={18} />
-            </button>
-          </div>
-        </div>
-      </header>
-      <div className="workspace">
-        <div className="topbar">
-          <div className="breadcrumb">
-            <span>Your journal, your journey</span>
-            <ChevronRight size={13} />
-            <strong>
-              {editor
-                ? modes.find((m) => m.id === editor)?.tag
-                : pageNames[page]}
-            </strong>
-          </div>
-          <div className="topbar-right">
-            <span className="today-date">
-              <CalendarDays size={15} />
+          <div className="header-tools">
+            <time className="header-date" dateTime={localDate()}>
+              <CalendarDays size={14} aria-hidden="true" />
               {new Date().toLocaleDateString("en-US", {
                 weekday: "short",
                 month: "short",
                 day: "numeric",
               })}
-            </span>
+            </time>
+            <div className="header-actions">
+              <button
+                className="header-new"
+                disabled={!!editor}
+                onClick={() => setModePicker(true)}
+              >
+                <Plus size={18} />
+                <span>New entry</span>
+              </button>
+              <button
+                className="icon-button header-utility"
+                aria-label="Settings & your data"
+                title="Settings & your data"
+                disabled={!!editor}
+                onClick={() => setSettings(true)}
+              >
+                <Settings2 size={18} />
+              </button>
+              <button
+                className="icon-button header-utility"
+                aria-label="Help"
+                title="Help"
+                onClick={() => setHelp(true)}
+              >
+                <CircleHelp size={18} />
+              </button>
+            </div>
           </div>
         </div>
+      </header>
+      <div className="workspace">
         <main id="main" className="main-content" tabIndex={-1}>
           {storageError && (
             <div className="error-message" role="alert">
@@ -311,8 +295,7 @@ export default function App() {
             <div className="sample-banner">
               <span>
                 <Sparkles size={15} />
-                You’re exploring a sample journal. These moments are just
-                examples.
+                Sample journal · Example entries
               </span>
               <button onClick={() => setSample(false)}>
                 Back to my journal
@@ -332,14 +315,11 @@ export default function App() {
           ) : loading ? (
             <div className="empty-state">
               <SproutArt />
-              <p>Making a little room for you…</p>
+              <p>Loading journal…</p>
             </div>
           ) : page === "home" ? (
             <div className="page-enter">
               <div className="welcome-line">
-                <span>
-                  <i /> A FRESH PAGE, A NEW POSSIBILITY
-                </span>
                 <button
                   className="text-button sample-link"
                   onClick={() => setSample((s) => !s)}
@@ -350,44 +330,26 @@ export default function App() {
               </div>
               <section className="welcome-card">
                 <div className="welcome-copy">
-                  <span className="eyebrow">WELCOME TO YOUR LITTLE CORNER</span>
-                  <h1>
-                    A little space.
-                    <br />A lot of <em>you.</em>
-                  </h1>
-                  <p>
-                    For the messy thoughts, the quiet wins, and everything
-                    <br className="desktop-only" /> in between. You can put it
-                    all here.
-                  </p>
+                  <h1>Your journal</h1>
+                  <p>Write, record, and revisit your entries.</p>
                   <button className="primary" onClick={() => start("writing")}>
                     <PenLine size={17} />
-                    Let’s make a little room
+                    Write an entry
                     <ArrowRight size={17} />
                   </button>
-                  <span className="welcome-footnote">
-                    No right words. No wrong feelings. Just you.
-                  </span>
                 </div>
                 <div className="welcome-art">
                   <JournalIllustration />
-                  <span className="art-caption handwritten">
-                    a place to begin, again & again
-                  </span>
                 </div>
               </section>
               <section className="start-section">
                 <div className="section-heading">
                   <div>
-                    <h2>How would you like to show up?</h2>
-                    <p>There’s more than one way to let it out.</p>
+                    <h2>Choose a format</h2>
                   </div>
-                  <span className="handwritten small-handwriting">
-                    come as you are ↙
-                  </span>
                 </div>
                 <div className="mode-grid">
-                  {modes.map(({ id, title, description, tag, Icon }) => (
+                  {modes.map(({ id, title, description, Icon }) => (
                     <button
                       key={id}
                       className={`mode-card mode-${id}`}
@@ -401,7 +363,6 @@ export default function App() {
                       </div>
                       <h3>{title}</h3>
                       <p>{description}</p>
-                      <span className="mode-tag">{tag}</span>
                       <span className="mode-doodle" aria-hidden="true">
                         {id === "writing" ? "✎" : id === "video" ? "✧" : "〰"}
                       </span>
@@ -413,8 +374,7 @@ export default function App() {
                 <section className="card check-in-card">
                   <div className="section-heading">
                     <div>
-                      <span className="eyebrow">A LITTLE CHECK-IN</span>
-                      <h3>What’s your inner weather?</h3>
+                      <h3>Mood check-in</h3>
                     </div>
                     <Heart size={20} strokeWidth={1.5} />
                   </div>
@@ -431,16 +391,16 @@ export default function App() {
                       </button>
                     ))}
                   </div>
-                  <p className="small-note">
-                    {mood
-                      ? `${moodInfo(mood)?.label} — we’ll carry this check-in into your next entry.`
-                      : "Whatever it is, there’s room for it here."}
-                  </p>
+                  {mood && (
+                    <p className="small-note">
+                      {moodInfo(mood)?.label} will be added to your next entry.
+                    </p>
+                  )}
                 </section>
                 <section className="card daily-prompt">
                   <div className="prompt-heading">
                     <span className="eyebrow">
-                      <Sparkles size={15} /> A THOUGHT TO START WITH
+                      <Sparkles size={15} /> JOURNAL PROMPT
                     </span>
                     <button
                       className="icon-button"
@@ -455,7 +415,7 @@ export default function App() {
                     className="text-button"
                     onClick={() => start("writing", prompt)}
                   >
-                    Follow this thought
+                    Use this prompt
                     <ArrowRight size={16} />
                   </button>
                   <span className="prompt-flower" aria-hidden="true">
@@ -466,8 +426,7 @@ export default function App() {
               <section className="recent-section">
                 <div className="section-heading">
                   <div>
-                    <h2>Your little collection of days</h2>
-                    <p>Every moment you keep is part of your story.</p>
+                    <h2>Recent entries</h2>
                   </div>
                   <button
                     className="text-button"
@@ -489,24 +448,19 @@ export default function App() {
                       <BookOpen size={27} strokeWidth={1.4} />
                     </span>
                     <div>
-                      <h3>Your first page is waiting.</h3>
-                      <p>
-                        It doesn’t have to be a big day to be worth remembering.
-                      </p>
+                      <h3>No entries yet</h3>
                     </div>
                     <button
                       className="text-button"
                       onClick={() => start("writing")}
                     >
-                      Begin your story
+                      Create an entry
                       <ArrowRight size={17} />
                     </button>
                   </div>
                 )}
               </section>
               <footer className="page-footer">
-                <Leaf size={14} />
-                <span>A little reflection goes a long way.</span>
                 <span className="footer-private">
                   <LockKeyhole size={12} />
                   Stored on this device
@@ -517,11 +471,10 @@ export default function App() {
             <div className="page-enter">
               <div className="page-heading">
                 <div>
-                  <span className="eyebrow">A COLLECTION OF YOU</span>
-                  <h1>Your little collection of days.</h1>
+                  <h1>Your journal</h1>
                   <p>
-                    {shown.length} moments · {days} days ·{" "}
-                    {totalWords.toLocaleString()} words, each one yours.
+                    {shown.length} entries · {days} days ·{" "}
+                    {totalWords.toLocaleString()} words
                   </p>
                 </div>
                 <button className="primary" onClick={() => setModePicker(true)}>
@@ -536,7 +489,7 @@ export default function App() {
                     aria-label="Search your journal"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Find a thought, a feeling, a day…"
+                    placeholder="Search entries…"
                   />
                   {query && (
                     <button
@@ -557,7 +510,7 @@ export default function App() {
                       onClick={() => setFilter(m)}
                     >
                       {m === "all"
-                        ? "All moments"
+                        ? "All entries"
                         : m === "voice"
                           ? "Voice"
                           : m.charAt(0).toUpperCase() + m.slice(1)}
@@ -569,7 +522,7 @@ export default function App() {
                   value={moodFilter}
                   onChange={(e) => setMoodFilter(e.target.value)}
                 >
-                  <option value="all">Every feeling</option>
+                  <option value="all">All moods</option>
                   {moods.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.label}
@@ -587,14 +540,12 @@ export default function App() {
                 <div className="card empty-state">
                   <SproutArt />
                   <h2>
-                    {shown.length
-                      ? "No moments found."
-                      : "A fresh start, just for you."}
+                    {shown.length ? "No entries found" : "No entries yet"}
                   </h2>
                   <p>
                     {shown.length
-                      ? "Try a different word, feeling, or journal mode."
-                      : "Write it, film it, or say it out loud. Your story starts wherever you are."}
+                      ? "Try a different search, mood, or format."
+                      : "Create a writing, video, or voice entry."}
                   </p>
                   {shown.length ? (
                     <button
@@ -638,11 +589,7 @@ export default function App() {
         </div>
       )}
       {modePicker && (
-        <Modal
-          title="Make a little room for yourself."
-          onClose={() => setModePicker(false)}
-        >
-          <p>How would you like to capture this moment?</p>
+        <Modal title="Choose a format" onClose={() => setModePicker(false)}>
           <div className="mode-picker">
             {modes.map(({ id, title, description, Icon }) => (
               <button
@@ -675,7 +622,7 @@ export default function App() {
       )}
       {settings && (
         <Modal
-          title="Your space, your choices."
+          title="Settings & your data"
           onClose={() => {
             if (!busy) setSettings(false);
           }}
@@ -734,7 +681,7 @@ export default function App() {
             </p>
           )}
           <div className="divider" />
-          <h3>A few things to know</h3>
+          <h3>Storage and analysis</h3>
           <ul className="help-list">
             <li>
               No account or cloud sync is needed. This journal belongs to this
@@ -760,21 +707,11 @@ export default function App() {
         </Modal>
       )}
       {help && (
-        <Modal
-          title="There’s no right way to begin."
-          onClose={() => setHelp(false)}
-        >
-          <div className="help-intro">
-            <SproutArt />
-            <p>
-              A few honest words. A voice memo on a walk. A quiet conversation
-              with your camera. It all counts.
-            </p>
-          </div>
+        <Modal title="How to use Leap" onClose={() => setHelp(false)}>
           <div className="help-step">
             <span>01</span>
             <div>
-              <h3>Choose how you show up</h3>
+              <h3>Choose a format</h3>
               <p>
                 Write, record a video, or make a voice memo. Shuffle through
                 prompts when you need a starting point.
@@ -784,20 +721,20 @@ export default function App() {
           <div className="help-step">
             <span>02</span>
             <div>
-              <h3>Make it feel like you</h3>
+              <h3>Customize your entry</h3>
               <p>
-                Add a mood, change your paper, or leave a little note in the
-                margin. Camera analysis and transcription are always optional.
+                Add a mood, change your paper, or add a note in the margin.
+                Camera analysis and transcription are optional.
               </p>
             </div>
           </div>
           <div className="help-step">
             <span>03</span>
             <div>
-              <h3>Notice the threads</h3>
+              <h3>Review connections and insights</h3>
               <p>
-                Your connections and insights grow with your journal. They’re
-                gentle prompts for reflection, never a diagnosis.
+                Compare related entries and view mood and writing trends.
+                Automated estimates are not clinical assessments.
               </p>
             </div>
           </div>
@@ -882,7 +819,7 @@ function EntryDetail({
         className={`detail-paper paper-${entry.decoration.paper} font-${entry.decoration.font}`}
       >
         <p className={`detail-text highlight-${entry.decoration.highlight}`}>
-          {entry.text || "This moment lives in your recording."}
+          {entry.text || "No text or transcript saved."}
         </p>
         {entry.decoration.stickers.length > 0 && (
           <div className="detail-stickers">

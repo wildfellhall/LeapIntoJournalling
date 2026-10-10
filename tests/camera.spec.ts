@@ -10,7 +10,7 @@ test("optional camera loads local models and ends capture before saving", async 
       loaded.push(r.url());
   });
   await page.goto("/");
-  await page.getByRole("button", { name: "Let’s make a little room" }).click();
+  await page.getByRole("button", { name: "Write an entry" }).click();
   await page.getByLabel("Expression tracking", { exact: true }).check();
   await page
     .getByRole("button", { name: "Enable camera", exact: true })
@@ -50,7 +50,7 @@ test("optional camera loads local models and ends capture before saving", async 
     .getByRole("button", { name: "Complete entry", exact: true })
     .click();
   await page
-    .getByRole("heading", { name: "A little piece of today", exact: true })
+    .getByRole("heading", { name: "Untitled entry", exact: true })
     .click();
   await page.getByText("Explore this entry’s signals", { exact: true }).click();
   await expect(page.locator(".analysis-details")).toContainText(

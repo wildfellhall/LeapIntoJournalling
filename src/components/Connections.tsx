@@ -59,21 +59,18 @@ export function Connections({
     <div className="page-enter">
       <div className="page-heading">
         <div>
-          <span className="eyebrow">THE THREADS BETWEEN YOUR DAYS</span>
-          <h1>It’s all connected.</h1>
-          <p>
-            Find familiar feelings, recurring themes, and the moments that echo.
-          </p>
+          <h1>Connections</h1>
+          <p>Compare entries by content and mood.</p>
         </div>
         <span className="badge">
           <Network size={14} />
-          {entries.length} moments
+          {entries.length} entries
         </span>
       </div>
       {!entries.length ? (
         <div className="card empty-state">
           <Sprout />
-          <h2>Your story will take shape here.</h2>
+          <h2>No connections yet</h2>
           <p>
             Save two entries to start seeing connections, or explore a sample
             journal.
@@ -87,7 +84,7 @@ export function Connections({
         <>
           <section className="card graph-filter">
             <label>
-              Start with a day
+              Entry date
               <input
                 type="date"
                 value={date}
@@ -99,7 +96,7 @@ export function Connections({
               Find connections
             </button>
             <label className="entry-select-label">
-              Or choose a moment
+              Or choose an entry
               <select
                 aria-label="Choose an entry to connect"
                 value={selected?.id}
@@ -126,8 +123,8 @@ export function Connections({
             <section className="card graph-card">
               <div className="graph-header">
                 <div>
-                  <h3>Your constellation</h3>
-                  <p>Each dot is a day. Each thread, a little connection.</p>
+                  <h3>Related entries</h3>
+                  <p>Each dot is an entry. Lines show similarity.</p>
                 </div>
                 <span className="tiny-tag">
                   {Math.min(30, entries.length)} of {entries.length} entries
@@ -292,7 +289,7 @@ export function Connections({
               </div>
             </section>
             <aside className="card related-card">
-              <span className="eyebrow">CLOSEST TO THIS MOMENT</span>
+              <span className="eyebrow">SELECTED ENTRY</span>
               <h3>{selected?.title}</h3>
               <p className="subtle">
                 {selected && readableDate(selected.date)}
@@ -318,7 +315,7 @@ export function Connections({
                       </span>
                       <p>
                         {r.shared.length
-                          ? `Shared threads: ${r.shared.slice(0, 3).join(", ")}`
+                          ? `Shared keywords: ${r.shared.slice(0, 3).join(", ")}`
                           : "A similar emotional tone"}
                         {r.face !== null ? " · expression data included" : ""}
                       </p>

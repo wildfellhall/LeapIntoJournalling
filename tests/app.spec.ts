@@ -6,7 +6,7 @@ async function startWriting(
   body = "I feel happy and grateful for the garden, flowers, and time with my friend.",
 ) {
   await page.goto("/");
-  await page.getByRole("button", { name: "Let’s make a little room" }).click();
+  await page.getByRole("button", { name: "Write an entry" }).click();
   await page
     .getByRole("textbox", { name: "Entry title", exact: true })
     .fill(title);
@@ -23,7 +23,7 @@ test("writing decorations, mood, autosave, durable save, search and detail", asy
   await page
     .getByRole("button", { name: "Back to your space", exact: true })
     .click();
-  await page.getByRole("button", { name: "Let’s make a little room" }).click();
+  await page.getByRole("button", { name: "Write an entry" }).click();
   await expect(
     page.getByRole("textbox", { name: "Entry title", exact: true }),
   ).toHaveValue("A gentle afternoon");
@@ -42,7 +42,7 @@ test("writing decorations, mood, autosave, durable save, search and detail", asy
   ).toHaveAttribute("aria-pressed", "true");
   await page.waitForTimeout(650);
   await page.reload();
-  await page.getByRole("button", { name: "Let’s make a little room" }).click();
+  await page.getByRole("button", { name: "Write an entry" }).click();
   await expect(
     page.getByRole("textbox", { name: "Entry title", exact: true }),
   ).toHaveValue("A gentle afternoon");
@@ -71,7 +71,7 @@ test("writing decorations, mood, autosave, durable save, search and detail", asy
   ).toBeVisible();
   await page.getByLabel("Search your journal").fill("missingword");
   await expect(
-    page.getByRole("heading", { name: "No moments found." }),
+    page.getByRole("heading", { name: "No entries found" }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Clear filters", exact: true })
@@ -114,7 +114,7 @@ test("sample journal is isolated and insights, graph, date lookup work", async (
       exact: true,
     }),
   ).toBeVisible();
-  await page.getByLabel("Start with a day").fill("2000-01-01");
+  await page.getByLabel("Entry date").fill("2000-01-01");
   await page
     .getByRole("button", { name: "Find connections", exact: true })
     .click();
@@ -128,7 +128,7 @@ test("sample journal is isolated and insights, graph, date lookup work", async (
   });
   await page.getByRole("button", { name: "Insights", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Your emotional landscape" }),
+    page.getByRole("heading", { name: "Mood over time" }),
   ).toBeVisible();
   await page.getByLabel("Insights date range").selectOption("7");
   await page.screenshot({
@@ -140,7 +140,7 @@ test("sample journal is isolated and insights, graph, date lookup work", async (
     .getByRole("button", { name: "Back to my journal", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Every little check-in adds up." }),
+    page.getByRole("heading", { name: "No insights yet" }),
   ).toBeVisible();
   expect(errors).toEqual([]);
 });
@@ -170,7 +170,7 @@ test("backup includes entries and restore recovers a deleted entry", async ({
     .getByRole("button", { name: "Delete permanently", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "A fresh start, just for you." }),
+    page.getByRole("heading", { name: "No entries yet" }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Settings & your data", exact: true })
@@ -192,7 +192,7 @@ for (const mode of ["voice", "video"] as const) {
     await page.goto("/");
     await page
       .getByRole("button", {
-        name: mode === "voice" ? /Say it out loud/ : /Show up as you are/,
+        name: mode === "voice" ? /Voice memo/ : /Video journal/,
       })
       .click();
     await page
@@ -266,13 +266,13 @@ test("mobile layout, navigation and dialogs fit a narrow viewport", async ({
   ).toBeLessThanOrEqual(390);
   await page.getByRole("button", { name: "Your journal", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "A fresh start, just for you." }),
+    page.getByRole("heading", { name: "No entries yet" }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Create your first entry", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toBeVisible();
-  await page.getByRole("button", { name: /Put pen to page/ }).click();
+  await page.getByRole("button", { name: /Writing journal/ }).click();
   await page
     .getByRole("textbox", { name: "Journal entry", exact: true })
     .fill("A little mobile moment.");
@@ -288,7 +288,7 @@ test("mobile layout, navigation and dialogs fit a narrow viewport", async ({
     .getByRole("button", { name: "Complete entry", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "A little piece of today", exact: true }),
+    page.getByRole("heading", { name: "Untitled entry", exact: true }),
   ).toBeVisible();
 });
 
@@ -300,7 +300,7 @@ test("permission denial is recoverable and no entry is invented", async ({
       Promise.reject(new DOMException("Permission denied", "NotAllowedError"));
   });
   await page.goto("/");
-  await page.getByRole("button", { name: /Say it out loud/ }).click();
+  await page.getByRole("button", { name: /Voice memo/ }).click();
   await page
     .getByRole("button", { name: "Start recording", exact: true })
     .click();
@@ -314,6 +314,6 @@ test("permission denial is recoverable and no entry is invented", async ({
     .getByRole("button", { name: "Back to your space", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Your first page is waiting." }),
+    page.getByRole("heading", { name: "No entries yet" }),
   ).toBeVisible();
 });

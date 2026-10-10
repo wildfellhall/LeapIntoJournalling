@@ -38,6 +38,8 @@ Browser tests use synthetic camera/microphone input and isolated browser profile
 
 ## How the signals work
 
+On **Insights**, choose a date range and select **Download report** to create an A4 PDF locally. The report includes mood counts, recurring words, a vector timeline with a daily values table, score sources, and limitations. An optional note adds context for the reader. Full journal titles and text/transcripts are included only when selected; recordings, camera data, and decorative notes are excluded. Sample reports are clearly labeled. Embedded fonts and selectable text make the report suitable for reading, printing, and uploading to an AI conversation. Characters outside the embedded font's coverage use reversible `[U+XXXX]` notation rather than disappearing. The PDF generator and fonts load only when a download is requested. Nothing is uploaded automatically.
+
 Text sentiment is a small, local English lexicon with negation handling. It is a baseline, not a language model; it can miss context, sarcasm, and languages other than English. A user's mood check-in takes precedence over the text score in the graph and charts.
 
 Connections combine TF–IDF word similarity (65%) with mood proximity (35%). When both entries contain facial-expression samples, expression cosine similarity contributes 10% and mood contributes 25%. Weights and the estimate limitations are explained in the interface.

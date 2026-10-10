@@ -21,7 +21,7 @@ class ErrorBoundary extends React.Component<
   render() {
     return this.state.failed ? (
       <main className="fatal">
-        <h1>Let’s take a small pause.</h1>
+        <h1>Unable to load the page</h1>
         <p>
           Something interrupted the page. Your saved entries are still on this
           device.

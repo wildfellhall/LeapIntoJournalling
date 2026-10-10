@@ -154,7 +154,7 @@ export function Editor({
     try {
       const entry: Entry = {
         id: crypto.randomUUID(),
-        title: draft.title.trim() || "A little piece of today",
+        title: draft.title.trim() || "Untitled entry",
         text: draft.text.trim(),
         date: draft.date,
         createdAt: new Date().toISOString(),
@@ -209,21 +209,13 @@ export function Editor({
       </div>
       <div className="page-heading">
         <div>
-          <span className="eyebrow">A MOMENT, JUST FOR YOU</span>
           <h1>
             {mode === "writing"
-              ? "Let it all out."
+              ? "Writing journal"
               : mode === "video"
-                ? "Be seen. Be yourself."
-                : "Your voice belongs here."}
+                ? "Video journal"
+                : "Voice memo"}
           </h1>
-          <p>
-            {mode === "writing"
-              ? "No perfect words needed. Just an honest place to begin."
-              : mode === "video"
-                ? "A little face-to-face with yourself. Take your time."
-                : "Say it as it comes. There’s no need to rehearse."}
-          </p>
         </div>
         <button
           className="primary"
@@ -239,7 +231,7 @@ export function Editor({
           <div className="prompt-ribbon">
             <Sparkles size={19} />
             <div>
-              <span className="eyebrow">A LITTLE NUDGE</span>
+              <span className="eyebrow">JOURNAL PROMPT</span>
               <p>
                 {draft.prompt ||
                   "What’s taking up a little space in your mind today?"}
@@ -332,16 +324,7 @@ export function Editor({
                         <Mic size={36} />
                       )}
                     </span>
-                    <h2>
-                      {mode === "video"
-                        ? "A safe space to show up"
-                        : "Take a breath. Press record."}
-                    </h2>
-                    <p>
-                      {mode === "video"
-                        ? "Your story, in your own words."
-                        : "Big feelings. Small observations. All welcome."}
-                    </p>
+                    <h2>Ready to record</h2>
                   </div>
                 )}
                 {capture.active && mode === "voice" && !camera && (
@@ -438,7 +421,7 @@ export function Editor({
                 </>
               ) : tool === "stickers" ? (
                 <>
-                  <span>A little personality</span>
+                  <span>Decorations</span>
                   {[
                     "🌼",
                     "🌿",
@@ -501,11 +484,7 @@ export function Editor({
             <input
               className="entry-title-input"
               aria-label="Entry title"
-              placeholder={
-                mode === "writing"
-                  ? "Give today a little title…"
-                  : "What’s on your mind?"
-              }
+              placeholder="Entry title"
               maxLength={150}
               value={draft.title}
               onChange={(e) => set({ title: e.target.value })}
@@ -517,7 +496,7 @@ export function Editor({
               }
               placeholder={
                 mode === "writing"
-                  ? "Start anywhere. This page is yours…"
+                  ? "Write your entry…"
                   : "Your live transcript will appear here if enabled. You can also type or paste a transcript, or add a few notes…"
               }
               value={draft.text}
@@ -550,7 +529,6 @@ export function Editor({
               <span>
                 {count} {count === 1 ? "word" : "words"}
               </span>
-              <span>Every word is a little leap.</span>
             </div>
           </div>
           {(error || capture.error) && (
@@ -561,9 +539,7 @@ export function Editor({
         </div>
         <aside className="editor-aside">
           <section className="card feeling-card">
-            <span className="eyebrow">CHECK IN WITH YOURSELF</span>
-            <h3>How does today feel?</h3>
-            <p>Your own words matter most.</p>
+            <h3>Mood (optional)</h3>
             <div className="mood-options vertical">
               {moods.map((m) => (
                 <button
@@ -580,14 +556,11 @@ export function Editor({
                 </button>
               ))}
             </div>
-            <span className="small-note">
-              Optional. Mixed feelings are welcome, too.
-            </span>
           </section>
           <section className="card expression-card">
             <div className="section-title">
               <Camera size={19} />
-              <h3>A fuller picture</h3>
+              <h3>Camera analysis</h3>
             </div>
             <p>Add optional facial-expression estimates to this entry.</p>
             <label className="toggle-label">
@@ -673,15 +646,10 @@ export function Editor({
               </>
             )}
           </section>
-          <div className="handwritten editor-reminder">
-            you don’t have to make
-            <br />
-            sense to make a start. <span>♡</span>
-          </div>
         </aside>
       </div>
       {confirmLeave && (
-        <Modal title="Keep this moment?" onClose={() => setConfirmLeave(false)}>
+        <Modal title="Leave this entry?" onClose={() => setConfirmLeave(false)}>
           <p>
             {mode === "writing"
               ? "Your text draft is saved. Leave now to discard the expression samples from this camera session, or keep journalling to complete the entry."
