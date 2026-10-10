@@ -1,21 +1,11 @@
 import { entryEmotions, emotionReliability, comparableFace } from "./signals";
+import { createContentIndex, sentimentTerms, stopwords } from "./content";
 import { moods, type Analysis, type Entry } from "./types";
 import { assessSentiment, SENTIMENT_VERSION } from "./sentiment";
 import { classifyEmotions, emotionLabels, EMOTION_VERSION } from "./emotions";
 
-export const ANALYSIS_VERSION = `${SENTIMENT_VERSION}/${EMOTION_VERSION}`;
+export const ANALYSIS_VERSION = `${SENTIMENT_VERSION}/${EMOTION_VERSION}/topics-2`;
 
-// Sentiment terms excluded from topic keywords; scoring uses VADER separately.
-const sentimentTerms = new Set(
-  "happy happiness joyful joy excited excitement wonderful love loved loving amazing grateful gratitude thankful proud peaceful peace calm content hope hopeful good great beautiful kind kindness safe connected connection laugh laughed laughter smile smiled enjoy enjoyed fun relieved relief relaxed supported support inspired optimistic better growth progress accomplished cozy rested sad sadness unhappy lonely alone hurt pain painful grief grieving depressed hopeless awful terrible hate hated angry anger furious anxious anxiety worried worry nervous fear afraid scared stressed stress overwhelmed exhausted tired frustrated frustration disappointed difficult hard failed failure guilt guilty shame upset cry cried".split(
-    " ",
-  ),
-);
-const stopwords = new Set(
-  "a an the i me my mine myself we our ours you your yours he she it its they them their and or but so to of in on at by for from with is am are was were be been being have has had do does did can could will would should may might this that these those as if than then when while where why how not no never very just really more most much many some any all each every one two also about into out up down today yesterday tomorrow day days feel felt feeling feelings get got going went go thing things want wanted know think time like little still something don t s ve ll m re t".split(
-    " ",
-  ),
-);
 const tokenize = (text: string) =>
   text.toLowerCase().match(/[a-z]+(?:'[a-z]+)?/g) || [];
 export function analyze(text: string): Analysis {
@@ -67,61 +57,54 @@ function cosine(a: Record<string, number>, b: Record<string, number>) {
   );
   return norm ? dot / norm : 0;
 }
+// Build text vectors and quality summaries once per corpus, not once per SVG edge.
+export function createConnectionIndex(corpus: Entry[]) {
+  const entries = [...new Map(corpus.map((entry) => [entry.id, entry])).values()];
+  const contentIndex = createContentIndex(entries);
+  const profiles = new Map(entries.map((entry) => [entry.id, {
+    emotions: entryEmotions(entry), reliability: emotionReliability(entry), face: comparableFace(entry),
+  }]));
+  const cache = new Map<string, ReturnType<typeof comparePair>>();
+  function comparePair(a: Entry, b: Entry) {
+    const content = contentIndex.compare(a, b);
+    const ap = profiles.get(a.id)!, bp = profiles.get(b.id)!;
+    const textAvailable = emotionLabels(ap.emotions).length > 0 && emotionLabels(bp.emotions).length > 0;
+    const textEmotion = textAvailable ? cosine(ap.emotions, bp.emotions) : null;
+    const textQuality = Math.sqrt(ap.reliability * bp.reliability);
+    const mood = a.mood && b.mood ? 1 - Math.abs(entryScore(a) - entryScore(b)) / 2 : null;
+    const faceQuality = Math.sqrt(ap.face.quality * bp.face.quality);
+    const face = faceQuality > 0 ? cosine(ap.face.scores, bp.face.scores) : null;
+    // Content always contributes at least 80%; mood check-ins at most 5%.
+    const textWeight = textEmotion === null ? 0 : 0.12 * textQuality;
+    const moodWeight = mood === null ? 0 : 0.05;
+    const faceWeight = face === null ? 0 : 0.03 * faceQuality;
+    // Return unused signal weight to content so optional signals retain their caps.
+    const contentWeight = 1 - textWeight - moodWeight - faceWeight;
+    const score = content.eligible
+      ? content.content * contentWeight + (textEmotion ?? 0) * textWeight + (mood ?? 0) * moodWeight + (face ?? 0) * faceWeight
+      : 0;
+    return {
+      ...content, score: Math.max(0, Math.min(1, score)), textEmotion, mood, face,
+      emotion: textEmotion ?? mood,
+      sharedEmotions: emotionLabels(ap.emotions).filter(({ id }) => (bp.emotions[id] ?? 0) > 0).map(({ label }) => label),
+    };
+  }
+  function compare(a: Entry, b: Entry) {
+    const key = JSON.stringify([a.id, b.id].sort());
+    if (!cache.has(key)) cache.set(key, comparePair(a, b));
+    return cache.get(key)!;
+  }
+  function rank(entry: Entry) {
+    return entries.filter((other) => other.id !== entry.id)
+      .map((other) => ({ entry: other, ...compare(entry, other) }))
+      .filter((result) => result.eligible)
+      .sort((a, b) => b.score - a.score || a.entry.id.localeCompare(b.entry.id));
+  }
+  return { compare, rank, patterns: contentIndex.patterns() };
+}
 export function similarity(a: Entry, b: Entry, corpus: Entry[]) {
-  const documents = corpus.map(
-    (e) =>
-      new Set(
-        tokenize(`${e.title} ${e.text}`).filter((w) => !stopwords.has(w)),
-      ),
-  );
-  const vector = (entry: Entry) => {
-    const counts: Record<string, number> = Object.create(null);
-    tokenize(`${entry.title} ${entry.text}`)
-      .filter((w) => w.length > 2 && !stopwords.has(w))
-      .forEach((w) => (counts[w] = (counts[w] || 0) + 1));
-    Object.keys(counts).forEach(
-      (w) =>
-        (counts[w] *=
-          Math.log(
-            1 + corpus.length / (1 + documents.filter((d) => d.has(w)).length),
-          ) + 1),
-    );
-    return counts;
-  };
-  const content = cosine(vector(a), vector(b));
-  const aEmotions = entryEmotions(a), bEmotions = entryEmotions(b);
-  const textAvailable = emotionLabels(aEmotions).length > 0 && emotionLabels(bEmotions).length > 0;
-  const textEmotion = textAvailable ? cosine(aEmotions, bEmotions) : null;
-  const textQuality = Math.sqrt(emotionReliability(a) * emotionReliability(b));
-  const mood = a.mood && b.mood ? 1 - Math.abs(entryScore(a) - entryScore(b)) / 2 : null;
-  const emotion = textEmotion !== null && mood !== null ? (textEmotion * textQuality + mood) / (1 + textQuality) : textEmotion ?? mood;
-  const aFace = comparableFace(a), bFace = comparableFace(b);
-  const faceQuality = Math.sqrt(aFace.quality * bFace.quality);
-  const faceAvailable = faceQuality > 0;
-  const face = faceAvailable ? cosine(aFace.scores, bFace.scores) : 0;
-  const faceWeight = 0.1 * faceQuality;
-  const emotionWeight = (0.35 - faceWeight) * (mood !== null ? 1 : textQuality);
-  const availableWeight = 0.65 + (emotion !== null ? emotionWeight : 0) + faceWeight;
-  const score = (content * 0.65 + (emotion ?? 0) * emotionWeight + face * faceWeight) / availableWeight;
-  const shared = a.analysis.keywords.filter((w) =>
-    b.analysis.keywords.includes(w),
-  );
-  return {
-    score: Math.max(0, Math.min(1, score)),
-    content,
-    emotion,
-    textEmotion,
-    mood,
-    sharedEmotions: emotionLabels(aEmotions)
-      .filter(({ id }) => (bEmotions[id] || 0) > 0)
-      .map(({ label }) => label),
-    face: faceAvailable ? face : null,
-    shared,
-  };
+  return createConnectionIndex([...corpus, a, b]).compare(a, b);
 }
 export function related(entry: Entry, entries: Entry[]) {
-  return entries
-    .filter((e) => e.id !== entry.id)
-    .map((e) => ({ entry: e, ...similarity(entry, e, entries) }))
-    .sort((a, b) => b.score - a.score);
+  return createConnectionIndex([...entries, entry]).rank(entry);
 }

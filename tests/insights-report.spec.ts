@@ -44,51 +44,51 @@ test("exports long entries and missing transcripts without uploading journal dat
   page,
 }, testInfo) => {
   await page.goto("/");
-  await page.evaluate(async () => {
-    const storagePath = "/src/lib/storage.ts";
-    const typesPath = "/src/lib/types.ts";
-    const analysisPath = "/src/lib/analysis.ts";
-    const { saveEntries } = await import(storagePath);
-    const { defaultDecoration, localDate } = await import(typesPath);
-    const { analyze } = await import(analysisPath);
-    const entries = Array.from({ length: 45 }, (_, index) => {
-      const date = new Date();
-      date.setDate(date.getDate() - index);
-      const text =
-        index === 0
-          ? ""
-          : index === 1
-            ? "Café, Привет, 你好, 🌱. " +
-              "A long reflection about work, rest, and relationships. ".repeat(
-                160,
-              ) +
-              "END_OF_LONG_ENTRY"
-            : "I felt calm in the garden today.";
-      return {
-        id: `report-test-${index}`,
-        date: localDate(date),
-        createdAt: date.toISOString(),
-        title: `Reflection ${index}`,
-        mode: index === 0 ? "voice" : "writing",
-        mood: index % 3 ? "calm" : null,
-        text,
-        analysis: analyze(text),
-        expressions: [],
-        decoration: { ...defaultDecoration },
-      };
-    });
-    await saveEntries(entries);
+  const entries = Array.from({ length: 45 }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - index);
+    const text =
+      index === 0
+        ? ""
+        : index === 1
+          ? "Café, Привет, 你好, 🌱. " +
+            "A long reflection about work, rest, and relationships. ".repeat(
+              160,
+            ) +
+            "END_OF_LONG_ENTRY"
+          : "I felt calm in the garden today.";
+    return {
+      id: `report-test-${index}`,
+      date: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`,
+      createdAt: date.toISOString(),
+      title: `Reflection ${index}`,
+      mode: index === 0 ? "voice" : "writing",
+      mood: index % 3 ? "calm" : null,
+      text,
+      analysis: { method: "local-lexicon", score: 0, wordCount: 0, keywords: [], emotions: {} },
+      expressions: [],
+      decoration: { font: "serif", paper: "cream", highlight: "none", stickers: [], note: "" },
+    };
   });
-  await page.reload();
+  // Restore through the UI so this check also works against compiled assets.
+  await page.getByRole("button", { name: "Settings & your data", exact: true }).click();
+  await page.locator("input[type=file]").setInputFiles({
+    name: "report-fixtures.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify({ format: "leap-journal", version: 2, entries })),
+  });
+  await expect(page.getByRole("dialog")).toContainText("Restored 45 entries");
+  await page.getByRole("button", { name: "Close dialog", exact: true }).click();
   await page.getByRole("button", { name: "Insights", exact: true }).click();
   await page.getByLabel("Insights date range").selectOption("all");
   await page.getByRole("button", { name: "Download report" }).click();
   await page.getByRole("checkbox").check();
   const externalRequests: string[] = [];
+  const appOrigin = new URL(page.url()).origin;
   page.on("request", (request) => {
     if (
       request.url().startsWith("http") &&
-      !request.url().startsWith("http://127.0.0.1:5173/")
+      new URL(request.url()).origin !== appOrigin
     )
       externalRequests.push(request.url());
   });
@@ -111,7 +111,10 @@ test("a failed PDF load preserves report choices and explains how to recover", a
   await page.getByRole("button", { name: "Insights", exact: true }).click();
   await page.getByRole("button", { name: "Download report" }).click();
   await page.getByLabel("Note for the reader").fill("Keep this note.");
-  await page.route("**/src/lib/insightsPdf.ts*", (route) => route.abort());
+  await page.route(
+    (url) => url.pathname === "/src/lib/insightsPdf.ts" || /^\/assets\/insightsPdf-.*\.js$/.test(url.pathname),
+    (route) => route.abort(),
+  );
   await page.getByRole("button", { name: "Download PDF", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText("couldn't be created");
   await expect(page.getByLabel("Note for the reader")).toHaveValue(

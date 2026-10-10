@@ -36,9 +36,9 @@ export function EmotionInsights({ summary }: { summary: InsightsSummary }) {
       </> : <div className="chart-empty">No clear text emotions in this date range.</div>}
       <p className="small-note">
         {summary.correctedEntries ? `${emotionEntries} of ${summary.emotionEligibleEntries} entries have emotion labels. ${summary.correctedEntries} reviewed by you; your labels take priority.` : `${emotionEntries} of ${textEntries} entries with text have an emotion estimate.`}
-        An entry can include several emotions. Neutral or uncertain text stays unlabeled;
-        days without text have no estimate. These labels are separate from your mood check-ins.
+        {" "}Mixed entries can appear in several categories.
       </p>
+      <details className="option-details"><summary>About these labels</summary><p>Labels come from your writing, transcripts, or corrections. Uncertain text stays unlabeled. These estimates are separate from mood check-ins.</p></details>
     </section>
     <section className="card chart-card">
       <h3>Text emotion distribution</h3>

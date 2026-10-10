@@ -259,14 +259,13 @@ export default function App() {
               })}
             </time>
             <div className="header-actions">
-              <button
+              {!editor && page !== "journal" && <button
                 className="header-new"
-                disabled={!!editor}
                 onClick={() => setModePicker(true)}
               >
                 <Plus size={18} />
                 <span>New entry</span>
-              </button>
+              </button>}
               <button
                 className="icon-button header-utility"
                 aria-label="Settings & your data"
@@ -690,7 +689,7 @@ export default function App() {
             </p>
           )}
           <div className="divider" />
-          <h3>Storage and analysis</h3>
+          <details className="option-details"><summary>Storage and analysis</summary>
           <ul className="help-list">
             <li>
               No account or cloud sync is needed. This journal belongs to this
@@ -705,16 +704,16 @@ export default function App() {
               Manual transcripts work in every browser.
             </li>
             <li>
-              Text emotions use a small English classifier on this device.
-              It estimates joy, sadness, anger, fear, disgust, and surprise;
-              unclear text stays unlabeled. VADER supplies the separate tone
-              score. Your mood check-in takes priority in the mood charts.
+              Text emotion estimates work in English. Unclear text stays
+              unlabeled, and you can review the labels on any saved entry.
+              Your mood check-in takes priority in mood charts.
             </li>
             <li>
               Voice energy measures loudness, not emotion. We do not infer
               feelings from your voice.
             </li>
           </ul>
+          </details>
         </Modal>
       )}
       {help && (

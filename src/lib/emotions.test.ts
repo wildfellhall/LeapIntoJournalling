@@ -85,9 +85,9 @@ describe("compact local emotion classifier", () => {
 
 describe("emotion-aware entry relationships", () => {
   it("distinguishes sadness from anger at the same negative sentiment score", () => {
-    const sad = entry("sad", "I am sad and lonely.");
-    const alsoSad = entry("sad2", "I am sad and lonely.");
-    const angry = entry("angry", "I am angry and frustrated.");
+    const sad = entry("sad", "Garden flowers. I am sad and lonely.");
+    const alsoSad = entry("sad2", "Garden flowers. I am sad and lonely.");
+    const angry = entry("angry", "Garden flowers. I am angry and frustrated.");
     for (const e of [sad, alsoSad, angry]) e.analysis.score = -0.7;
     const corpus = [sad, alsoSad, angry];
     expect(similarity(sad, alsoSad, corpus).textEmotion).toBe(1);

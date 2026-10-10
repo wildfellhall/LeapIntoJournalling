@@ -40,7 +40,7 @@ describe("journal analysis", () => {
     const b = entry("b", "Happy in the garden with flowers and trees.");
     const c = entry("c", "The work deadline made me anxious and exhausted.");
     expect(related(a, [a, b, c])[0].entry.id).toBe("b");
-    expect(related(a, [a, b, c])).toHaveLength(2);
+    expect(related(a, [a, b, c])).toHaveLength(1);
     expect(similarity(a, b, [a, b, c]).score).toBeCloseTo(
       similarity(b, a, [a, b, c]).score,
     );

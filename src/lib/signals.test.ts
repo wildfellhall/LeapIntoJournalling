@@ -32,7 +32,8 @@ describe("context and evidence", () => {
     expect(sparse.analysis.evidence!.coverage).toBeLessThan(0.01);
     expect(sparse.analysis.evidence!.reliability).toBeLessThan(brief.analysis.evidence!.reliability);
     const target = entry("target", "I am devastated.");
-    expect(similarity(sparse, target, [sparse, target]).score).toBeLessThan(similarity(brief, target, [brief, target]).score);
+    expect(similarity(sparse, target, [sparse, target]).eligible).toBe(false);
+    expect(similarity(brief, target, [brief, target]).eligible).toBe(false);
   });
 });
 

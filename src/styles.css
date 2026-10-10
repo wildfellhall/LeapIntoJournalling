@@ -730,6 +730,7 @@ button.primary:hover:not(:disabled) {
   gap: 19px;
   margin-top: 25px;
 }
+.home-middle > .card { min-width: 0; }
 .check-in-card {
   padding: 21px 24px 17px;
 }
@@ -894,8 +895,12 @@ button.primary:hover:not(:disabled) {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   margin-top: auto;
   color: #67715e;
+}
+.entry-card-footer > svg {
+  flex-shrink: 0;
 }
 .mood-label {
   display: inline-flex;
@@ -1967,8 +1972,9 @@ button.primary:hover:not(:disabled) {
 }
 .connections-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 275px;
+  grid-template-columns: minmax(0, 1fr) 320px;
   gap: 20px;
+  align-items: start;
 }
 .graph-card {
   overflow: hidden;
@@ -1980,7 +1986,10 @@ button.primary:hover:not(:disabled) {
   justify-content: space-between;
   gap: 10px;
   padding: 23px 25px 5px;
+  flex-wrap: wrap;
 }
+.graph-header > div { flex: 1 1 220px; }
+.graph-header select { max-width: 100%; font-size: 12px; }
 .graph-header h3 {
   font-family: "Lora", serif;
   font-weight: 400;
@@ -2004,8 +2013,8 @@ button.primary:hover:not(:disabled) {
 .graph-canvas > svg {
   display: block;
   width: 100%;
-  height: auto;
-  min-height: 370px;
+  height: 460px;
+  min-height: 0;
 }
 .graph-node {
   cursor: pointer;
@@ -2102,21 +2111,23 @@ button.primary:hover:not(:disabled) {
 }
 .related-item > div {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .related-item h4 {
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.5;
   color: #617259;
   font-weight: 500;
 }
 .related-item div > span {
   display: block;
-  font-size: 8px;
+  font-size: 11px;
   color: #6a7262;
   margin-top: 5px;
 }
 .related-item p {
-  font-size: 9px;
+  font-size: 12px;
   color: #6a7262;
   margin-top: 6px;
   line-height: 1.6;
@@ -2124,7 +2135,24 @@ button.primary:hover:not(:disabled) {
 .related-item > svg {
   color: #66705d;
   margin-top: 4px;
+  flex-shrink: 0;
 }
+.connection-empty { font-size: 13px; line-height: 1.8; color: #63715c; }
+.connection-method, .option-details { margin-top: 16px; font-size: 12px; line-height: 1.7; color: #63715c; }
+.connection-method summary, .option-details summary { cursor: pointer; }
+.connection-method p { margin-top: 12px; }
+.recurring-patterns { margin-top: 24px; padding: 24px; }
+.recurring-patterns h3 { font: 400 20px "Lora", serif; }
+.recurring-patterns > .section-title { flex-wrap: wrap; gap: 12px; }
+.pattern-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 14px; margin-top: 20px; align-items: start; }
+.pattern-item { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: #f8faf4; min-width: 0; }
+.pattern-item summary { cursor: pointer; font-size: 14px; color: #3f604a; }
+.pattern-item summary strong { font-weight: 500; text-transform: capitalize; }
+.pattern-item summary > span { display: block; margin: 8px 0 0 18px; font-size: 12px; color: #63715c; }
+.pattern-entries { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; max-height: 280px; overflow-y: auto; }
+.pattern-entries button { width: 100%; font-size: 12px; text-align: left; }
+.pattern-entries button > span { flex: 1; overflow-wrap: anywhere; }
+.pattern-entries small, .pattern-entries svg { flex-shrink: 0; }
 .related-card > .small-note {
   font-size: 9px;
   margin-top: 22px;
@@ -3833,11 +3861,8 @@ button.primary:hover:not(:disabled) {
     min-height: 340px;
   }
   .graph-canvas > svg {
-    min-height: 340px;
-    min-width: 520px;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
+    min-height: 0;
+    min-width: 0;
   }
   .graph-legend {
     gap: 11px;
@@ -4073,3 +4098,23 @@ button.primary:hover:not(:disabled) {
 .transcript-review textarea { width: 100%; min-height: 110px; padding: 12px; margin: 8px 0; border: 1px solid #d5ded1; border-radius: 10px; background: white; resize: vertical; font: inherit; }
 .transcript-passage { display: grid; }
 @media (max-width: 600px) { .entry-signals { padding: 15px; } }
+@media (max-width: 600px) {
+  .graph-canvas { min-height: 280px; }
+  .graph-canvas > svg { height: 300px; min-height: 0; }
+  .graph-node text { font-size: 26px; }
+  .graph-node .graph-node-label { display: none; }
+  .graph-header > div { flex-basis: 100%; }
+  .graph-header .tiny-tag { display: inline-flex; font-size: 11px; }
+  .graph-header p { font-size: 12px; line-height: 1.7; }
+  .graph-legend { gap: 12px; }
+  .graph-legend span { font-size: 10px; }
+  .recurring-patterns { padding: 20px; }
+  .related-item h4 { font-size: 14px; }
+  .related-item p { font-size: 12px; }
+  .related-item div > span { font-size: 11px; }
+}
+@media (max-width: 360px) {
+  .welcome-art, .mode-doodle { display: none; }
+  .mood-options.horizontal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .recent-section .section-heading { flex-wrap: wrap; gap: 12px; }
+}

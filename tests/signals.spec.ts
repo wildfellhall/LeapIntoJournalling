@@ -100,23 +100,24 @@ test("stopping during the local speech availability check prevents late recognit
   expect(await page.evaluate(() => (window as any).__speechTest.starts)).toEqual([]);
 });
 
-test("a speech pack downloads only after an explicit click", async ({ page }) => {
+test("transcription never requests a language-pack download", async ({ page }) => {
   await mockSpeech(page, "downloadable");
   await page.goto("/");
   await page.getByRole("button", { name: /Voice memo/ }).click();
   await expect(page.getByLabel("Live transcription", { exact: true })).toBeDisabled();
-  await expect(page.getByRole("button", { name: "Install English speech pack" })).toBeVisible();
+  await expect(page.getByText("On-device transcription is unavailable here. Type or paste a transcript below; no downloads are required.")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Install.*speech pack/ })).toHaveCount(0);
+  await page.getByRole("textbox", { name: "Transcript and notes", exact: true }).fill("I feel happy after planting flowers in the garden.");
+  await page.getByRole("button", { name: "Complete entry", exact: true }).click();
   expect(await page.evaluate(() => (window as any).__speechTest.installs)).toBe(0);
-  await page.getByRole("button", { name: "Install English speech pack" }).click();
-  await expect(page.getByLabel("Live transcription", { exact: true })).toBeEnabled();
-  expect(await page.evaluate(() => (window as any).__speechTest.installs)).toBe(1);
+  expect(await page.evaluate(() => (window as any).__speechTest.starts)).toEqual([]);
 });
 
 test("legacy cloud-capable speech never becomes a fallback", async ({ page }) => {
   await mockSpeech(page, "legacy");
   await page.goto("/");
   await page.getByRole("button", { name: /Voice memo/ }).click();
-  await expect(page.getByText("On-device transcription is unavailable here. Add a transcript manually.")).toBeVisible();
+  await expect(page.getByText("On-device transcription is unavailable here. Type or paste a transcript below; no downloads are required.")).toBeVisible();
   await expect(page.getByLabel("Live transcription", { exact: true })).toBeDisabled();
   await page.getByRole("textbox", { name: "Transcript and notes", exact: true }).fill("I feel afraid.");
   await page.getByRole("button", { name: "Complete entry", exact: true }).click();

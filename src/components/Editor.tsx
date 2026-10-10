@@ -405,7 +405,7 @@ export function Editor({
                   ) : (
                     <div className="audio-playback">
                       <Mic size={40} />
-                      <h2>Your words, held here.</h2>
+                      <h2>Review your recording</h2>
                       <audio
                         controls
                         src={recordingUrl}
@@ -601,9 +601,8 @@ export function Editor({
           <section className="card expression-card">
             <div className="section-title">
               <Camera size={19} />
-              <h3>Camera analysis</h3>
+              <h3>{mode === "writing" ? "Camera analysis" : "Recording options"}</h3>
             </div>
-            <p>Add optional facial-expression estimates to this entry.</p>
             <label className="toggle-label">
               <span>Expression tracking</span>
               <input
@@ -657,12 +656,12 @@ export function Editor({
               </span>
             )}
             <p className="small-note">
-              Processed on your device. Expressions are imperfect signals, not a
-              reading of how you feel.{" "}
-              {mode === "voice"
-                ? "Camera video is not saved with voice memos."
-                : ""}
+              Optional estimates, processed on this device.
             </p>
+            <details className="option-details">
+              <summary>About expression estimates</summary>
+              <p className="small-note">Expressions do not establish how you feel.{mode === "voice" ? " Camera video is not saved with voice memos." : ""}</p>
+            </details>
             {mode !== "writing" && (
               <>
                 <div className="divider" />
@@ -681,10 +680,9 @@ export function Editor({
                 </label>
                 <p className="small-note">
                   {capture.speechSupported
-                    ? "English transcription runs on this device. Review the transcript after recording; timing is approximate."
-                    : capture.speechStatus === "downloadable" ? "Local English transcription needs a browser language pack. Its size is controlled by your browser; nothing downloads automatically." : capture.speechStatus === "downloading" ? "Your browser is installing the English speech pack…" : "On-device transcription is unavailable here. Add a transcript manually."}
+                    ? "English transcription is ready on this device. No download needed."
+                    : capture.speechStatus === "checking" ? "Checking on-device transcription…" : "On-device transcription is unavailable here. Type or paste a transcript below; no downloads are required."}
                 </p>
-                {capture.speechStatus === "downloadable" && <button className="secondary" disabled={capture.active || capture.loading} onClick={() => void capture.installSpeech()}>Install English speech pack</button>}
               </>
             )}
           </section>

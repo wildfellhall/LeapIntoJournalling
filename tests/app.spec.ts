@@ -256,6 +256,12 @@ test("mobile layout, navigation and dialogs fit a narrow viewport", async ({
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
+  await page.getByRole("heading", { name: "Your journal", exact: true }).waitFor();
+  for (const width of [320, 390, 768]) {
+    await page.setViewportSize({ width, height: 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({
     path: "/tmp/leap-mobile.png",
     fullPage: true,

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { AcousticSample, ExpressionSample, Mode, TranscriptPassage } from "./types";
 import { acousticSample, faceQuality, smoothExpressions } from "./mediaSignals";
-import { localRecognition, speechAvailability, installSpeechPack, type Recognition, type SpeechAvailability } from "./localSpeech";
+import { localRecognition, speechAvailability, type Recognition, type SpeechAvailability } from "./localSpeech";
 export function useCapture(mode: Mode, onTranscript: (passage: TranscriptPassage) => void) {
   const videoRef = useRef<HTMLVideoElement>(null),
     streamRef = useRef<MediaStream | null>(null),
@@ -33,14 +33,6 @@ export function useCapture(mode: Mode, onTranscript: (passage: TranscriptPassage
     if (mode !== "writing") void speechAvailability().then((status) => { if (!cancelled) setSpeechStatus(status); });
     return () => { cancelled = true; };
   }, [mode]);
-  async function installSpeech() {
-    setSpeechStatus("downloading");
-    try {
-      const installed = await installSpeechPack();
-      const status = installed ? await speechAvailability() : "downloadable";
-      if (mounted.current) { setSpeechStatus(status); if (!installed) setError("The English speech pack could not be installed. You can add a transcript manually."); }
-    } catch { if (mounted.current) { setSpeechStatus("downloadable"); setError("Speech pack installation failed. You can try again or add a transcript manually."); } }
-  }
   function release() {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
@@ -340,7 +332,6 @@ export function useCapture(mode: Mode, onTranscript: (passage: TranscriptPassage
     sampleCount,
     speechSupported,
     speechStatus,
-    installSpeech,
     start,
     stop,
     reset,

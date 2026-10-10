@@ -205,10 +205,8 @@ export function Insights({
                 </ResponsiveContainer>
               </div>
               <p className="small-note">
-                Your selected mood takes priority. Entries without a check-in
-                use an approximate text sentiment score when text is available.
-                Entries without either are left unscored. These are reflections,
-                not clinical measurements.
+                Uses your mood check-in, or text tone when no mood was selected.
+                Entries without either are unscored.
               </p>
             </section>
             <section className="card chart-card mood-chart">
