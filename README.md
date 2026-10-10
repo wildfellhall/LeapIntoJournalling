@@ -1,6 +1,6 @@
 # Leap Into Journalling
 
-A local-first React journal built from `Instructions.md`. Soft mint surfaces, botanical illustrations, Lora headings, and a scrapbook writing page give each moment a little room.
+Journal that allows users to create their entries through writing, voice, or video. 
 
 ## Run locally
 
