@@ -11,7 +11,6 @@ import {
   LayoutGrid,
   Leaf,
   LockKeyhole,
-  Menu,
   Mic,
   Network,
   PenLine,
@@ -110,7 +109,6 @@ export default function App() {
     [settings, setSettings] = useState(false),
     [help, setHelp] = useState(false),
     [modePicker, setModePicker] = useState(false),
-    [mobileNav, setMobileNav] = useState(false),
     [toast, setToast] = useState("");
   const [query, setQuery] = useState(""),
     [filter, setFilter] = useState("all"),
@@ -140,7 +138,6 @@ export default function App() {
   function navigate(next: Page) {
     if (editor) return;
     setPage(next);
-    setMobileNav(false);
     window.scrollTo({ top: 0, behavior: "instant" });
   }
   function start(mode: Mode, withPrompt = "") {
@@ -148,7 +145,6 @@ export default function App() {
     setInitialPrompt(withPrompt);
     setEditor(mode);
     setModePicker(false);
-    setMobileNav(false);
     window.scrollTo({ top: 0, behavior: "instant" });
   }
   async function save(entry: Entry) {
@@ -207,105 +203,85 @@ export default function App() {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      {mobileNav && (
-        <button
-          className="nav-overlay"
-          aria-label="Close navigation"
-          onClick={() => setMobileNav(false)}
-        />
-      )}
-      <aside className={`sidebar ${mobileNav ? "open" : ""}`}>
-        <button
-          className="brand"
-          onClick={() => navigate("home")}
-          disabled={!!editor}
-          aria-label="Leap home"
-        >
-          <span className="brand-icon">
-            <Leaf size={29} strokeWidth={1.6} />
-          </span>
-          <span>
-            <strong>
-              leap<span className="brand-period">.</span>
-            </strong>
-            <small>into journalling</small>
-          </span>
-        </button>
-        <div className="sidebar-label">YOUR LITTLE CORNER</div>
-        <nav aria-label="Main navigation">
-          {(
-            [
-              { id: "home", Icon: LayoutGrid },
-              { id: "journal", Icon: BookOpen },
-              { id: "connections", Icon: Network },
-              { id: "insights", Icon: TrendingUp },
-            ] as const
-          ).map(({ id, Icon }) => (
-            <button
-              key={id}
-              className={`nav-item ${page === id && !editor ? "active" : ""}`}
-              aria-current={page === id && !editor ? "page" : undefined}
-              disabled={!!editor}
-              title={
-                editor
-                  ? "Use Back to your space to leave the editor"
-                  : undefined
-              }
-              onClick={() => navigate(id)}
-            >
-              <Icon size={19} strokeWidth={1.7} />
-              <span>{pageNames[id]}</span>
-              {id === "journal" && entries.length > 0 && (
-                <b>{entries.length}</b>
-              )}
-              {page === id && !editor && <i />}
-            </button>
-          ))}
-        </nav>
-        <button
-          className="sidebar-new"
-          disabled={!!editor}
-          onClick={() => setModePicker(true)}
-        >
-          <Plus size={18} />A new little moment
-        </button>
-        <div className="sidebar-bottom">
-          <div className="sidebar-note">
-            <SproutArt />
-            <p>
-              Small moments.
-              <br />
-              Meaningful beginnings.
-            </p>
-            <span>grow at your own pace.</span>
-          </div>
+      <header className="app-header">
+        <div className="header-inner">
           <button
-            className="nav-item"
+            className="brand"
+            onClick={() => navigate("home")}
             disabled={!!editor}
-            onClick={() => setSettings(true)}
+            aria-label="Leap home"
           >
-            <Settings2 size={18} />
-            <span>Settings & your data</span>
+            <span className="brand-icon">
+              <Leaf size={29} strokeWidth={1.6} />
+            </span>
+            <span>
+              <strong>
+                leap<span className="brand-period">.</span>
+              </strong>
+              <small>into journalling</small>
+            </span>
           </button>
-          <button className="nav-item" onClick={() => setHelp(true)}>
-            <CircleHelp size={18} />
-            <span>A little guidance</span>
-          </button>
-          <div className="privacy-label">
-            <LockKeyhole size={13} />A space that’s only yours
+          <nav className="primary-nav" aria-label="Main navigation">
+            {(
+              [
+                { id: "home", Icon: LayoutGrid },
+                { id: "journal", Icon: BookOpen },
+                { id: "connections", Icon: Network },
+                { id: "insights", Icon: TrendingUp },
+              ] as const
+            ).map(({ id, Icon }) => (
+              <button
+                key={id}
+                className={`nav-item ${page === id && !editor ? "active" : ""}`}
+                aria-current={page === id && !editor ? "page" : undefined}
+                disabled={!!editor}
+                title={
+                  editor
+                    ? "Use Back to your space to leave the editor"
+                    : undefined
+                }
+                onClick={() => navigate(id)}
+              >
+                <Icon size={19} strokeWidth={1.7} />
+                <span>{pageNames[id]}</span>
+                {id === "journal" && entries.length > 0 && (
+                  <b>{entries.length}</b>
+                )}
+              </button>
+            ))}
+          </nav>
+          <div className="header-actions">
+            <button
+              className="header-new"
+              disabled={!!editor}
+              onClick={() => setModePicker(true)}
+            >
+              <Plus size={18} />
+              <span>New entry</span>
+            </button>
+            <button
+              className="icon-button header-utility"
+              aria-label="Settings & your data"
+              title="Settings & your data"
+              disabled={!!editor}
+              onClick={() => setSettings(true)}
+            >
+              <Settings2 size={18} />
+            </button>
+            <button
+              className="icon-button header-utility"
+              aria-label="A little guidance"
+              title="A little guidance"
+              onClick={() => setHelp(true)}
+            >
+              <CircleHelp size={18} />
+            </button>
           </div>
         </div>
-      </aside>
+      </header>
       <div className="workspace">
-        <header className="topbar">
+        <div className="topbar">
           <div className="breadcrumb">
-            <button
-              className="icon-button mobile-menu"
-              aria-label="Open navigation"
-              onClick={() => setMobileNav(true)}
-            >
-              <Menu size={22} />
-            </button>
             <span>Your journal, your journey</span>
             <ChevronRight size={13} />
             <strong>
@@ -323,11 +299,8 @@ export default function App() {
                 day: "numeric",
               })}
             </span>
-            <span className="profile-avatar" aria-label="Your personal space">
-              <Leaf size={20} />
-            </span>
           </div>
-        </header>
+        </div>
         <main id="main" className="main-content" tabIndex={-1}>
           {storageError && (
             <div className="error-message" role="alert">

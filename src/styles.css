@@ -286,30 +286,36 @@ button.primary:hover:not(:disabled) {
 .app-shell {
   min-height: 100vh;
 }
-.sidebar {
-  position: fixed;
-  inset: 0 auto 0 0;
-  width: 229px;
-  border-right: 1px solid #e2e8dc;
-  background: #f5f7ee;
-  padding: 31px 21px 20px;
+.app-header {
+  position: sticky;
+  top: 0;
   z-index: 30;
+  border-bottom: 1px solid #e2e8dc;
+  background: #f5f7ee;
+}
+.header-inner {
+  max-width: 1500px;
+  min-height: 92px;
+  margin: 0 auto;
+  padding: 18px 40px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
 }
 .brand {
   border: 0;
   background: none;
   display: flex;
-  gap: 10px;
+  flex-shrink: 0;
   align-items: center;
+  gap: 10px;
+  padding: 0;
   text-align: left;
-  padding: 0 11px;
-  margin-bottom: 49px;
 }
 .brand-icon {
-  width: 40px;
-  height: 46px;
+  width: 36px;
+  height: 43px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -324,7 +330,7 @@ button.primary:hover:not(:disabled) {
 .brand strong {
   display: block;
   font-family: "Lora", serif;
-  font-size: 38px;
+  font-size: 34px;
   font-weight: 400;
   line-height: 0.9;
   letter-spacing: -2px;
@@ -334,38 +340,29 @@ button.primary:hover:not(:disabled) {
 }
 .brand small {
   display: block;
-  font-size: 9px;
-  letter-spacing: 1.7px;
+  font-size: 8px;
+  letter-spacing: 1.5px;
   margin-top: 8px;
   color: #63735c;
 }
-.sidebar-label {
-  font-size: 8px;
-  color: #686f60;
-  font-weight: 600;
-  letter-spacing: 1.6px;
-  padding: 0 14px;
-  margin-bottom: 15px;
-}
-.sidebar nav {
+.primary-nav {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 5px;
 }
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: 9px;
   border: 0;
-  background: none;
-  text-align: left;
-  width: 100%;
-  min-height: 43px;
-  padding: 11px 14px;
   border-radius: 10px;
-  font-size: 12px;
+  background: none;
+  padding: 12px 15px;
+  min-height: 44px;
+  font-size: 13px;
   color: #67735f;
-  position: relative;
+  white-space: nowrap;
 }
 .nav-item:hover:not(:disabled) {
   background: #eaf0e2;
@@ -375,84 +372,150 @@ button.primary:hover:not(:disabled) {
   color: #48623d;
   font-weight: 600;
 }
-.nav-item i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #6e8c57;
-  position: absolute;
-  right: 15px;
-}
 .nav-item b {
-  margin-left: auto;
-  margin-right: 7px;
   font-size: 9px;
   background: #e1e8d9;
   border-radius: 5px;
   padding: 2px 5px;
   font-weight: 500;
 }
-.sidebar-new {
-  background: none;
-  border: 1px dashed #c9d4bc;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-new {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  min-height: 42px;
+  padding: 10px 15px;
+  border: 1px dashed #b7c6a6;
   border-radius: 11px;
-  padding: 12px 5px;
-  margin-top: 26px;
-  font-size: 11px;
+  background: transparent;
   color: #607453;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-right: 4px;
 }
-.sidebar-new:hover:not(:disabled) {
+.header-new:hover:not(:disabled) {
   background: #e8efdf;
 }
-.sidebar-bottom {
-  margin-top: auto;
-  padding-top: 30px;
-}
-.sidebar-note {
-  text-align: center;
-  padding: 17px 0 28px;
-}
-.sidebar-note svg {
-  width: 73px;
-  height: 73px;
-}
-.sidebar-note p {
-  font-size: 13px;
-  line-height: 1.65;
-  color: #65715c;
-}
-.sidebar-note span {
-  display: block;
-  font-family: "Caveat", cursive;
-  color: #67715a;
-  font-size: 20px;
-  margin-top: 7px;
-}
-.sidebar-bottom .nav-item {
-  font-size: 11px;
-  gap: 10px;
-}
-.privacy-label {
-  padding-top: 23px;
-  margin-top: 15px;
-  border-top: 1px solid #e2e7d9;
-  display: flex;
-  gap: 7px;
-  align-items: center;
-  justify-content: center;
-  font-size: 9px;
-  color: #67725d;
+.header-utility {
+  width: 40px;
+  height: 40px;
+  color: #67735f;
 }
 .workspace {
-  margin-left: 229px;
-  min-height: 100vh;
+  min-height: calc(100vh - 92px);
 }
 .topbar {
-  height: 79px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+#main {
+  scroll-margin-top: 110px;
+}
+@media (min-width: 1550px) {
+  .header-inner {
+    padding-inline: 55px;
+  }
+}
+@media (max-width: 1100px) {
+  .header-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 15px 20px;
+    padding: 18px 28px 12px;
+  }
+  .primary-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: center;
+  }
+  .nav-item {
+    flex: 1;
+    max-width: 200px;
+  }
+  #main {
+    scroll-margin-top: 160px;
+  }
+}
+@media (max-width: 760px) {
+  .header-inner {
+    padding: 16px 22px 11px;
+    gap: 15px 12px;
+  }
+  .primary-nav {
+    gap: 4px;
+  }
+  .nav-item {
+    padding: 10px 8px;
+    font-size: 12px;
+    gap: 7px;
+  }
+}
+@media (max-width: 520px) {
+  .header-inner {
+    padding: 16px 17px 10px;
+    gap: 15px 8px;
+  }
+  .brand {
+    gap: 8px;
+  }
+  .brand-icon {
+    width: 30px;
+    height: 36px;
+  }
+  .brand-icon svg {
+    width: 23px;
+  }
+  .brand strong {
+    font-size: 30px;
+  }
+  .brand small {
+    font-size: 7px;
+    letter-spacing: 1px;
+    margin-top: 7px;
+  }
+  .header-actions {
+    gap: 3px;
+  }
+  .header-new {
+    min-height: 38px;
+    padding: 9px 10px;
+    font-size: 11px;
+    gap: 5px;
+    margin-right: 2px;
+  }
+  .header-new svg {
+    width: 16px;
+  }
+  .header-utility {
+    width: 34px;
+    height: 38px;
+  }
+  .nav-item {
+    flex-direction: column;
+    gap: 6px;
+    padding: 9px 4px;
+    font-size: 10px;
+    position: relative;
+  }
+  .nav-item svg {
+    width: 18px;
+    height: 18px;
+  }
+  .nav-item b {
+    position: absolute;
+    top: 5px;
+    right: 9px;
+    font-size: 8px;
+  }
+}
+.topbar {
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -483,20 +546,6 @@ button.primary:hover:not(:disabled) {
   gap: 8px;
   font-size: 11px;
   color: #66735e;
-}
-.profile-avatar {
-  width: 34px;
-  height: 34px;
-  background: #e9eede;
-  border: 1px solid #d9e2cc;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #607550;
-}
-.mobile-menu {
-  display: none;
 }
 .main-content {
   max-width: 1500px;
@@ -2195,7 +2244,7 @@ button.primary:hover:not(:disabled) {
 .toast {
   position: fixed;
   bottom: 28px;
-  left: calc(50% + 114px);
+  left: 50%;
   transform: translateX(-50%);
   z-index: 100;
   border: 1px solid #c9ddbd;
@@ -2451,9 +2500,6 @@ button.primary:hover:not(:disabled) {
 .page-enter {
   animation: arrive 0.3s ease-out;
 }
-.nav-overlay {
-  display: none;
-}
 @keyframes arrive {
   from {
     opacity: 0;
@@ -2526,33 +2572,11 @@ button.primary:hover:not(:disabled) {
   }
 }
 @media (max-width: 1200px) {
-  .sidebar {
-    width: 204px;
-    padding: 30px 16px 17px;
-  }
-  .workspace {
-    margin-left: 204px;
-  }
   .main-content {
     padding: 25px 28px 10px;
   }
   .topbar {
     padding: 0 28px;
-  }
-  .brand {
-    padding-left: 9px;
-  }
-  .brand strong {
-    font-size: 35px;
-  }
-  .brand small {
-    font-size: 8px;
-  }
-  .sidebar-label {
-    font-size: 7px;
-  }
-  .nav-item {
-    font-size: 11px;
   }
   .welcome-card {
     min-height: 320px;
@@ -2678,49 +2702,16 @@ button.primary:hover:not(:disabled) {
     font-size: 8px;
   }
   .toast {
-    left: calc(50% + 102px);
+    left: 50%;
   }
 }
 @media (max-width: 1000px) {
-  .sidebar {
-    width: 184px;
-    padding: 28px 12px 18px;
-  }
-  .workspace {
-    margin-left: 184px;
-  }
-  .brand {
-    gap: 8px;
-    padding-left: 6px;
-  }
-  .brand-icon {
-    width: 34px;
-    height: 40px;
-  }
-  .brand strong {
-    font-size: 33px;
-  }
-  .brand small {
-    font-size: 7px;
-    letter-spacing: 1.4px;
-  }
-  .sidebar-new {
-    font-size: 9px;
-  }
-  .sidebar-bottom .nav-item {
-    font-size: 9px;
-    padding: 10px;
-  }
-  .privacy-label {
-    font-size: 8px;
-    gap: 5px;
-  }
   .main-content {
     padding: 24px 24px 10px;
   }
   .topbar {
     padding: 0 24px;
-    height: 70px;
+    height: 48px;
   }
   .breadcrumb {
     font-size: 9px;
@@ -2992,67 +2983,13 @@ button.primary:hover:not(:disabled) {
     padding: 26px;
   }
   .toast {
-    left: calc(50% + 92px);
+    left: 50%;
   }
 }
 @media (max-width: 760px) {
-  .sidebar {
-    transform: translateX(-100%);
-    transition: transform 0.2s;
-    width: 235px;
-    padding: 28px 22px;
-    z-index: 60;
-  }
-  .sidebar.open {
-    transform: translateX(0);
-  }
-  .sidebar .brand {
-    margin-bottom: 38px;
-  }
-  .sidebar .nav-item {
-    font-size: 13px;
-    min-height: 46px;
-  }
-  .sidebar .sidebar-label {
-    font-size: 8px;
-  }
-  .sidebar .sidebar-new {
-    font-size: 12px;
-  }
-  .sidebar .brand strong {
-    font-size: 39px;
-  }
-  .sidebar .brand small {
-    font-size: 9px;
-  }
-  .sidebar .sidebar-bottom .nav-item {
-    font-size: 12px;
-  }
-  .sidebar .privacy-label {
-    font-size: 9px;
-  }
-  .sidebar-note {
-    padding: 10px 0 20px;
-  }
-  .nav-overlay {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: #2f452f44;
-    border: 0;
-    z-index: 50;
-  }
-  .workspace {
-    margin-left: 0;
-  }
   .topbar {
-    height: 65px;
+    height: 48px;
     padding: 0 22px;
-  }
-  .mobile-menu {
-    display: inline-flex;
-    margin-left: -7px;
-    color: #5e7452;
   }
   .breadcrumb > span,
   .breadcrumb > svg {
@@ -3066,10 +3003,6 @@ button.primary:hover:not(:disabled) {
   }
   .today-date {
     font-size: 10px;
-  }
-  .profile-avatar {
-    width: 30px;
-    height: 30px;
   }
   .main-content {
     padding: 23px 22px 10px;
@@ -3989,12 +3922,6 @@ button.primary:hover:not(:disabled) {
 .section-heading p {
   font-size: 12px;
 }
-.nav-item {
-  font-size: 13px;
-}
-.sidebar-bottom .nav-item {
-  font-size: 12px;
-}
 .page-heading p {
   font-size: 13px;
 }
@@ -4047,16 +3974,10 @@ button.primary:hover:not(:disabled) {
   .mode-card p {
     font-size: 11px;
   }
-  .sidebar-bottom .nav-item {
-    font-size: 10px;
-  }
 }
 @media (max-width: 1000px) {
   .welcome-copy p {
     font-size: 11px;
-  }
-  .nav-item {
-    font-size: 12px;
   }
   .mode-card p {
     font-size: 10px;
@@ -4104,9 +4025,6 @@ button.primary:hover:not(:disabled) {
   }
   .mood-options.horizontal button {
     font-size: 9px;
-  }
-  .sidebar .sidebar-bottom .nav-item {
-    font-size: 12px;
   }
   .first-entry-card p {
     font-size: 12px;

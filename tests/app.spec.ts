@@ -20,9 +20,13 @@ test("writing decorations, mood, autosave, durable save, search and detail", asy
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await startWriting(page);
-  await page.getByRole("button", { name: "Back to your space", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Back to your space", exact: true })
+    .click();
   await page.getByRole("button", { name: "Let’s make a little room" }).click();
-  await expect(page.getByRole("textbox", { name: "Entry title", exact: true })).toHaveValue("A gentle afternoon");
+  await expect(
+    page.getByRole("textbox", { name: "Entry title", exact: true }),
+  ).toHaveValue("A gentle afternoon");
   await page.getByLabel("Journal font").selectOption("handwritten");
   await page.getByRole("button", { name: "Stickers", exact: true }).click();
   await page
@@ -207,9 +211,15 @@ for (const mode of ["voice", "video"] as const) {
     await expect(
       page.getByRole("button", { name: "Record again", exact: true }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Back to your space", exact: true }).click();
-    await expect(page.getByRole("dialog")).toContainText("Leaving will discard the recording");
-    await page.getByRole("button", { name: "Keep journalling", exact: true }).click();
+    await page
+      .getByRole("button", { name: "Back to your space", exact: true })
+      .click();
+    await expect(page.getByRole("dialog")).toContainText(
+      "Leaving will discard the recording",
+    );
+    await page
+      .getByRole("button", { name: "Keep journalling", exact: true })
+      .click();
     await page
       .getByRole("textbox", { name: "Entry title", exact: true })
       .fill(`${mode} moment`);
@@ -254,9 +264,6 @@ test("mobile layout, navigation and dialogs fit a narrow viewport", async ({
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth),
   ).toBeLessThanOrEqual(390);
-  await page
-    .getByRole("button", { name: "Open navigation", exact: true })
-    .click();
   await page.getByRole("button", { name: "Your journal", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "A fresh start, just for you." }),

@@ -4,9 +4,10 @@ A local-first React journal built from `Instructions.md`. Soft mint surfaces, bo
 
 ## Run locally
 
-Requires Node.js 22.12+ and npm.
+Use Node.js 22 LTS and npm. `.nvmrc` and `package.json` select the same Node major version for local development and Vercel builds.
 
 ```sh
+nvm use            # If you use nvm; install Node 22 first with nvm install
 npm ci
 npm run dev
 ```
@@ -21,6 +22,26 @@ npx playwright test # With the dev server running; uses installed Google Chrome
 ```
 
 Browser tests use synthetic camera/microphone input and isolated browser profiles. They never open your real camera or microphone. For another Chromium install, change `launchOptions.channel` in `playwright.config.ts`.
+
+## Deploy to Vercel
+
+1. Open [New Project in Vercel](https://vercel.com/new) and import the private GitHub repository `wildfellhall/LeapIntoJournalling`. Grant Vercel access to that repository if it is not listed.
+2. Keep the root directory at the repository root (`./`) and select the `main` production branch. The checked-in `vercel.json` supplies these settings:
+
+   | Setting | Value |
+   | --- | --- |
+   | Framework preset | Vite |
+   | Install command | `npm ci` |
+   | Build command | `npm run build` |
+   | Output directory | `dist` |
+   | Node.js version | 22.x (from `package.json`) |
+   | Environment variables | None required |
+
+3. Click **Deploy**. The prebuild step copies the local expression models from the installed dependency into the production assets automatically. Fonts and illustrations are also included in the build.
+
+The SPA rewrite follows [Vercel's Vite guidance](https://vercel.com/docs/frameworks/frontend/vite#using-vite-to-make-spas). The app currently selects its pages in memory, so refreshing returns to Your space. No server functions, database provisioning, API keys, or hosting plugins are needed.
+
+After deployment, use the app's HTTPS URL for camera and microphone access. Journal storage is specific to each origin: export a backup from localhost, then restore it on the deployed URL to move your entries. A private GitHub repository does not make the deployed app private; configure Vercel's deployment protection if needed.
 
 ## Included
 
@@ -58,4 +79,4 @@ Voice energy is measured with Web Audio RMS and retained as an acoustic observat
 
 `src/App.tsx` contains the application shell and journal library. `src/components/` contains the editor, graph, charts, illustrations, and modal. `src/lib/` contains storage, analysis, prompts, demo data, and the media capture hook. Fonts, illustrations, and model assets are self-hosted. `scripts/copy-models.mjs` runs before development and production builds.
 
-The Sites hosting manifest is `.openai/hosting.json`. The production output is a static `dist/` directory; a private Sites deployment can serve it without a journal backend.
+`vercel.json` configures static deployment of `dist/`. Generated output, local Vercel project metadata, and environment files are excluded from Git.
