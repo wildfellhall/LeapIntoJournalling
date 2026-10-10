@@ -10,6 +10,10 @@ Screenshots use fictional journal entries.
 | --- | --- |
 | ![Journal home with entry formats, mood check-in, prompts, and recent entries](docs/screenshots/home.png) | ![Writing editor with a handwritten entry, sticker, sticky note, and mood selection](docs/screenshots/writing.png) |
 
+| Voice journal | Video journal |
+| --- | --- |
+| ![Voice memo editor with recording controls, sample notes, mood selection, and optional camera analysis and transcription](docs/screenshots/voice.png) | ![Video journal editor with recording controls, sample notes, mood selection, and optional camera analysis and transcription](docs/screenshots/video.png) |
+
 | Connections | Insights |
 | --- | --- |
 | ![Entry similarity graph with date lookup and related entries](docs/screenshots/connections.png) | ![Insights with mood trends, word counts, recurring keywords, and the PDF report download button](docs/screenshots/insights.png) |
