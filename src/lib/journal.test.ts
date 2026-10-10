@@ -46,7 +46,7 @@ describe("journal analysis", () => {
     );
     expect(similarity(a, b, [a, b, c]).shared).toContain("garden");
   });
-  it("includes stored expression samples only when both entries have them", () => {
+  it("does not use legacy expression samples without timing and quality", () => {
     const a = {
       ...entry("face-a", "A day in the garden"),
       expressions: [{ at: 0, scores: { happy: 0.9, sad: 0.1 } }],
@@ -56,7 +56,7 @@ describe("journal analysis", () => {
       expressions: [{ at: 0, scores: { happy: 0.8, sad: 0.2 } }],
     };
     const c = entry("face-c", "A day in the garden");
-    expect(similarity(a, b, [a, b, c]).face).toBeGreaterThan(0.9);
+    expect(similarity(a, b, [a, b, c]).face).toBeNull();
     expect(similarity(a, c, [a, b, c]).face).toBeNull();
   });
   it("handles words that match object property names without corrupting similarity", () => {

@@ -1,3 +1,4 @@
+import { entryEmotions, entryEmotionDescription } from "../lib/signals";
 import { useMemo, useState } from "react";
 import {
   ArrowRight,
@@ -9,7 +10,7 @@ import {
 } from "lucide-react";
 import { type Entry, moods, moodInfo, readableDate } from "../lib/types";
 import { related, similarity } from "../lib/analysis";
-import { emotionDefinitions, emotionDescription, emotionLabels } from "../lib/emotions";
+import { emotionDefinitions, emotionLabels } from "../lib/emotions";
 import { Sprout } from "./Illustrations";
 export function Connections({
   entries,
@@ -213,7 +214,7 @@ export function Connections({
                         className="graph-node"
                       >
                         <title>
-                          {entry.title} · {readableDate(entry.date)} · Text estimate: {emotionDescription(entry.analysis)}
+                          {entry.title} · {readableDate(entry.date)} · {entry.emotionCorrection ? "Your labels" : "Text estimate"}: {entryEmotionDescription(entry)}
                         </title>
                         {i === 0 && (
                           <circle cx={x} cy={y} r="42" fill="#e5f5e8" />
@@ -222,7 +223,7 @@ export function Connections({
                           cx={x}
                           cy={y}
                           r={i === 0 ? 29 : 18}
-                          fill={(colorBy === "emotion" ? emotionLabels(entry.analysis.emotions)[0]?.color : moodInfo(entry.mood)?.color) || "#dde7db"}
+                          fill={(colorBy === "emotion" ? emotionLabels(entryEmotions(entry))[0]?.color : moodInfo(entry.mood)?.color) || "#dde7db"}
                           stroke={i === 0 ? "#446f51" : "#fafbf7"}
                           strokeWidth={i === 0 ? 2 : 4}
                         />
@@ -301,7 +302,7 @@ export function Connections({
               <p className="subtle">
                 {selected && readableDate(selected.date)}
               </p>
-              <p className="subtle">Text estimate: {selected && emotionDescription(selected.analysis)}</p>
+              <p className="subtle">{selected?.emotionCorrection ? "Your labels" : "Text estimate"}: {selected && entryEmotionDescription(selected)}</p>
               <button className="text-button" onClick={() => onOpen(selected)}>
                 Read this entry
                 <ArrowRight size={15} />
@@ -336,10 +337,10 @@ export function Connections({
                 <p>Add one more entry to discover your first connection.</p>
               )}
               <p className="small-note">
-                Connections combine words (65%) and emotion profiles (35%).
+                Connections compare words and emotions. Sparse text evidence has less influence.
                 When both entries have mood check-ins, those also inform the emotion comparison.
-                Facial estimates contribute 10% when available, leaving 25% for emotions.
-                Missing signals are omitted and weights adjusted. Node colors show the strongest text emotion or your selected mood.
+                Quality-checked expressions can contribute up to 10% when aligned with a transcript and consistent with its labels. Your corrections and mood check-ins take priority.
+                Missing signals are omitted and weights adjusted. Node colors show the strongest emotion or your selected mood.
               </p>
             </aside>
           </div>

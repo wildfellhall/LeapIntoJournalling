@@ -1,0 +1,417 @@
+{
+  "version": "goemotions-linear-1/segments-2",
+  "provenance": "Authored synthetic regression scenarios; not blind evaluation or measured accuracy on real journals. Difficult cases are retained, including failures.",
+  "total": 36,
+  "exactMatches": 29,
+  "perLabel": {
+    "joy": {
+      "tp": 7,
+      "fp": 0,
+      "fn": 4,
+      "precision": 1,
+      "recall": 0.6363636363636364
+    },
+    "sadness": {
+      "tp": 5,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.8333333333333334
+    },
+    "anger": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.6666666666666666
+    },
+    "fear": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1,
+      "recall": 0.5
+    },
+    "disgust": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1
+    },
+    "surprise": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1,
+      "recall": 1
+    }
+  },
+  "results": [
+    {
+      "id": "self-joy",
+      "text": "I am delighted about my new apartment.",
+      "labels": [
+        "joy"
+      ],
+      "predicted": [
+        "joy"
+      ],
+      "exact": true,
+      "coverage": 0.14285714285714285
+    },
+    {
+      "id": "self-sad",
+      "text": "I feel despondent tonight.",
+      "labels": [
+        "sadness"
+      ],
+      "predicted": [
+        "sadness"
+      ],
+      "exact": true,
+      "coverage": 0.25
+    },
+    {
+      "id": "self-anger",
+      "text": "I am livid after being ignored.",
+      "labels": [
+        "anger"
+      ],
+      "predicted": [
+        "anger"
+      ],
+      "exact": true,
+      "coverage": 0.3333333333333333
+    },
+    {
+      "id": "self-fear",
+      "text": "I feel apprehensive about the appointment.",
+      "labels": [
+        "fear"
+      ],
+      "predicted": [
+        "fear"
+      ],
+      "exact": true,
+      "coverage": 0.16666666666666666
+    },
+    {
+      "id": "self-disgust",
+      "text": "I am revolted by what I saw.",
+      "labels": [
+        "disgust"
+      ],
+      "predicted": [
+        "disgust"
+      ],
+      "exact": true,
+      "coverage": 0.14285714285714285
+    },
+    {
+      "id": "self-surprise",
+      "text": "I'm astonished by the result.",
+      "labels": [
+        "surprise"
+      ],
+      "predicted": [
+        "surprise"
+      ],
+      "exact": true,
+      "coverage": 0.2
+    },
+    {
+      "id": "mixed",
+      "text": "I am happy and sad.",
+      "labels": [
+        "joy",
+        "sadness"
+      ],
+      "predicted": [
+        "joy",
+        "sadness"
+      ],
+      "exact": true,
+      "coverage": 0.4
+    },
+    {
+      "id": "contrast",
+      "text": "I was angry yesterday but I am grateful today.",
+      "labels": [
+        "anger",
+        "joy"
+      ],
+      "predicted": [
+        "anger",
+        "joy"
+      ],
+      "exact": true,
+      "coverage": 0.25
+    },
+    {
+      "id": "negation",
+      "text": "I am not happy.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "negation-contrast",
+      "text": "I am not sad. I feel hopeful.",
+      "labels": [
+        "joy"
+      ],
+      "predicted": [
+        "joy"
+      ],
+      "exact": true,
+      "coverage": 0.14285714285714285
+    },
+    {
+      "id": "other",
+      "text": "My friend is sad and lonely.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "other-pronoun",
+      "text": "She is furious about the meeting.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "other-self",
+      "text": "She is terrified but I feel relieved.",
+      "labels": [
+        "joy"
+      ],
+      "predicted": [
+        "joy"
+      ],
+      "exact": true,
+      "coverage": 0.16666666666666666
+    },
+    {
+      "id": "reported-quotation",
+      "text": "My friend said, \"I am angry.\"",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "quotation",
+      "text": "\"I am so happy,\" the character said.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "hypothetical",
+      "text": "If I were happy I would go out.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "wish",
+      "text": "I wish I felt happy.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "anticipated",
+      "text": "I might be scared tomorrow.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "sarcasm",
+      "text": "Yeah right, I am so happy about another delay.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "factual",
+      "text": "I watered the plants before going to work.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "unsupported",
+      "text": "今天我很开心",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "empty",
+      "text": "",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "past",
+      "text": "I felt heartbroken last week.",
+      "labels": [
+        "sadness"
+      ],
+      "predicted": [
+        "sadness"
+      ],
+      "exact": true,
+      "coverage": 0.4
+    },
+    {
+      "id": "present",
+      "text": "I feel joyful now.",
+      "labels": [
+        "joy"
+      ],
+      "predicted": [
+        "joy"
+      ],
+      "exact": true,
+      "coverage": 0.25
+    },
+    {
+      "id": "two-subjects",
+      "text": "I am happy and she is sad.",
+      "labels": [
+        "joy"
+      ],
+      "predicted": [
+        "joy"
+      ],
+      "exact": true,
+      "coverage": 0.16666666666666666
+    },
+    {
+      "id": "uncertain",
+      "text": "I have several thoughts about the day.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "idiom",
+      "text": "I keep smiling thinking about the picnic.",
+      "labels": [
+        "joy"
+      ],
+      "predicted": [],
+      "exact": false,
+      "coverage": 0
+    },
+    {
+      "id": "indirect-grief",
+      "text": "The house feels empty since the goodbye.",
+      "labels": [
+        "sadness"
+      ],
+      "predicted": [],
+      "exact": false,
+      "coverage": 0
+    },
+    {
+      "id": "indirect-fear",
+      "text": "My stomach tightened before the exam.",
+      "labels": [
+        "fear"
+      ],
+      "predicted": [],
+      "exact": false,
+      "coverage": 0
+    },
+    {
+      "id": "indirect-anger",
+      "text": "Being talked over again made my blood boil.",
+      "labels": [
+        "anger"
+      ],
+      "predicted": [],
+      "exact": false,
+      "coverage": 0
+    },
+    {
+      "id": "subtle-mixed",
+      "text": "The move is a fresh start but I miss my old home.",
+      "labels": [
+        "joy",
+        "sadness"
+      ],
+      "predicted": [
+        "sadness"
+      ],
+      "exact": false,
+      "coverage": 0.09090909090909091
+    },
+    {
+      "id": "unmarked-sarcasm",
+      "text": "Wonderful, another missed train and a two-hour wait.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "idiom-negation",
+      "text": "I cannot wait for the celebration.",
+      "labels": [
+        "joy"
+      ],
+      "predicted": [],
+      "exact": false,
+      "coverage": 0
+    },
+    {
+      "id": "reported-first-person",
+      "text": "I could tell my friend was heartbroken.",
+      "labels": [],
+      "predicted": [],
+      "exact": true,
+      "coverage": 0
+    },
+    {
+      "id": "double-negative",
+      "text": "I am not unhappy today.",
+      "labels": [
+        "joy"
+      ],
+      "predicted": [],
+      "exact": false,
+      "coverage": 0
+    },
+    {
+      "id": "sparse",
+      "text": "I went to the store. I made lunch. I washed the dishes. I feel sad.",
+      "labels": [
+        "sadness"
+      ],
+      "predicted": [
+        "sadness"
+      ],
+      "exact": true,
+      "coverage": 0.06666666666666667
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 import model from "./emotion-model.json";
 
-export const EMOTION_VERSION = `${model.version}/segments-1`;
+export const EMOTION_VERSION = `${model.version}/segments-2`;
 export const emotionDefinitions = [
   { id: "joy", label: "Joy", color: "#edd28f" },
   { id: "sadness", label: "Sadness", color: "#a8c9e1" },
@@ -12,6 +12,23 @@ export const emotionDefinitions = [
 export type Emotion = (typeof emotionDefinitions)[number]["id"];
 export type EmotionStatus = "classified" | "neutral" | "uncertain" | "no-text";
 export type EmotionScores = Partial<Record<Emotion, number>>;
+export interface EmotionSegment {
+  text: string;
+  start: number;
+  end: number;
+  subject: "self" | "other" | "unspecified";
+  time: "past" | "present" | "anticipated";
+  emotions: EmotionScores;
+  strength: number;
+  evidenceWords: number;
+  excluded?: "other-person" | "quotation" | "hypothetical" | "sarcasm-cue";
+}
+export interface EmotionEvidence {
+  coverage: number;
+  strength: number;
+  reliability: number;
+  segments: EmotionSegment[];
+}
 
 const terms: Record<string, number[]> = model.terms;
 const labels = model.labels as (Emotion | "neutral")[];
@@ -96,16 +113,40 @@ function maskNegation(words: string[]) {
   });
 }
 
-export function classifyEmotions(text: string): { emotions: EmotionScores; emotionStatus: EmotionStatus } {
-  if (!text.trim()) return { emotions: {}, emotionStatus: "no-text" };
+export function classifyEmotions(text: string): { emotions: EmotionScores; emotionStatus: EmotionStatus; evidence: EmotionEvidence } {
+  const segments: EmotionSegment[] = [];
   const accumulated: EmotionScores = {};
   let neutral = false;
-  // Sentence/contrast boundaries preserve mixed feelings, including transcripts.
-  // Bound work per segment without discarding the end of a long entry.
-  for (const sentence of text.split(/[.!?;\n]+|\b(?:but|however|yet)\b/iu)) {
-    const words = maskNegation(tokenize(sentence));
+  let totalWords = 0, evidenceWords = 0, strengthTotal = 0, acceptedWords = 0;
+  const quoted = [...text.matchAll(/[“"][^”"\n]*[”"]/gu)].map((match) => [match.index!, match.index! + match[0].length]);
+  // Keep offsets for passage review; split changes of speaker as well as contrasts.
+  const boundary = /[.!?;\n]+|\b(?:but|however|yet)\b|\b(?:and|because|while|although)(?=\s+(?:I|he|she|they|my\s+\w+)\b)/giu;
+  let offset = 0;
+  const spans: [number, number][] = [];
+  for (const match of text.matchAll(boundary)) { spans.push([offset, match.index!]); offset = match.index! + match[0].length; }
+  spans.push([offset, text.length]);
+  for (const [from, to] of spans) {
+    const sentence = text.slice(from, to);
+    const tokens = [...sentence.toLowerCase().replace(/[‘’]/g, "'").matchAll(/[a-z]+(?:'[a-z]+)?/g)];
+    const words = maskNegation(tokens.map((token) => token[0]));
+    totalWords += words.length;
+    const self = /\b(?:i|i'm|i've|me|myself)\b/i.test(sentence);
+    const selfFeeling = directFeelings(words).length > 0 || /\b(?:i (?:cried|cry|smiled|smile|laughed|laugh|wept|miss|love|hate|resent|regret|worry)|made me|left me|upset me)\b/i.test(sentence);
+    const other = !selfFeeling && /\b(?:he|she|they|him|her|them|his|their|my (?:friend|partner|mother|father|mom|dad|sister|brother|child|boss|colleague))\b/i.test(sentence);
+    const subject = other ? "other" : self ? "self" : "unspecified";
+    const time = /\b(?:i (?:am|feel)|i'm)\b/i.test(sentence) ? "present" : /\b(?:tomorrow|will|would|might|could|next week)\b/i.test(sentence) ? "anticipated"
+      : /\b(?:yesterday|last (?:night|week|month|year)|used to|felt|was|were)\b/i.test(sentence) ? "past" : "present";
+    const excluded: EmotionSegment["excluded"] = /\b(?:yeah right|as if|sarcasm|sarcastic)\b|\/s\b/i.test(sentence) ? "sarcasm-cue"
+      : /\b(?:if|wish|pretend|imagining)\b/i.test(sentence) || (!selfFeeling && /\b(?:would|might|could)\b/i.test(sentence)) ? "hypothetical"
+      : other ? "other-person" : undefined;
     for (let start = 0; start < words.length; start += 80) {
       const chunk = words.slice(start, start + 80);
+      const first = from + tokens[start].index!, last = tokens[Math.min(tokens.length - 1, start + 79)];
+      const end = from + last.index! + last[0].length;
+      const segment: EmotionSegment = { text: text.slice(first, end), start: first, end, subject, time, emotions: {}, strength: 0, evidenceWords: 0,
+        excluded: quoted.some(([a, b]) => a < end && b > first) ? "quotation" : excluded };
+      segments.push(segment);
+      if (segment.excluded) continue;
       const explicit = directFeelings(chunk);
       const substantive = chunk.filter((word) => !filler.has(word));
       const known = substantive.filter((word) => Object.hasOwn(terms, word));
@@ -118,16 +159,34 @@ export function classifyEmotions(text: string): { emotions: EmotionScores; emoti
         if (label === "neutral") neutral = true;
         else if (evidence[i] >= 0.75 && !accepted[label]) accepted[label] = scores[i];
       }
+      const values = Object.values(accepted);
+      if (!values.length) continue;
+      // Count the words that support a label, not every word in its sentence.
+      const support = chunk.filter((word) => {
+        if (directCues.has(word) && accepted[directCues.get(word)!]) return true;
+        const term = Object.hasOwn(terms, word) ? terms[word] : undefined;
+        return term && !filler.has(word) && labels.some((label, i) => label !== "neutral" && accepted[label] && term[i + 1] / model.scale > 1);
+      }).length;
+      segment.emotions = accepted;
+      segment.strength = values.reduce((sum, value) => sum + value, 0) / values.length;
+      segment.evidenceWords = Math.max(1, support);
+      evidenceWords += segment.evidenceWords;
+      strengthTotal += segment.strength * segment.evidenceWords;
+      acceptedWords += segment.evidenceWords;
       for (const [label, value] of Object.entries(accepted))
-        accumulated[label as Emotion] = (accumulated[label as Emotion] || 0) + value * chunk.length;
+        accumulated[label as Emotion] = (accumulated[label as Emotion] || 0) + value * segment.evidenceWords;
     }
   }
+  const coverage = totalWords ? Math.min(1, evidenceWords / totalWords) : 0;
+  const strength = acceptedWords ? strengthTotal / acceptedWords : 0;
+  // A ranking weight, NOT a calibrated probability that someone feels an emotion.
+  const evidence = { coverage, strength, reliability: strength * Math.sqrt(coverage), segments };
   const total = Object.values(accumulated).reduce((sum, value) => sum + value, 0);
   if (total) {
     for (const key of Object.keys(accumulated) as Emotion[]) accumulated[key]! /= total;
-    return { emotions: accumulated, emotionStatus: "classified" };
+    return { emotions: accumulated, emotionStatus: "classified", evidence };
   }
-  return { emotions: {}, emotionStatus: neutral ? "neutral" : "uncertain" };
+  return { emotions: {}, emotionStatus: !text.trim() ? "no-text" : neutral ? "neutral" : "uncertain", evidence };
 }
 
 export function emotionLabels(scores: Record<string, number>) {

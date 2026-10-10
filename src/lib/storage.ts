@@ -1,6 +1,7 @@
 import { type Entry, moods } from "./types";
 import { normalizeStickers, validStoredStickers } from "./stickers";
 import { analyze, upgradeAnalysis } from "./analysis";
+import { emotionDefinitions } from "./emotions";
 let dbPromise: Promise<IDBDatabase> | undefined;
 function database() {
   return (dbPromise ||= new Promise((resolve, reject) => {
@@ -75,7 +76,7 @@ export async function exportEntries(entries: Entry[]) {
     [
       JSON.stringify({
         format: "leap-journal",
-        version: 2,
+        version: 3,
         exportedAt: new Date().toISOString(),
         entries: records,
       }),
@@ -133,6 +134,32 @@ function validateEntry(e: Omit<Entry, "recording">) {
     )
   )
     throw new Error("The backup contains invalid expression data.");
+  const number = (n: unknown, min = 0, max = 1): n is number => typeof n === "number" && Number.isFinite(n) && n >= min && n <= max;
+  const duration = e.duration ?? 86400;
+  const chronological = (values: number[]) => values.every((value, index) => index === 0 || value >= values[index - 1]);
+  if (!number(duration, 0, 86400) || e.expressions.length > 10000 || e.expressions.some((s) =>
+    !number(s.at, 0, duration + 1) || (s.quality !== undefined && !number(s.quality)) ||
+    (s.model !== undefined && (typeof s.model !== "string" || s.model.length > 100)) ||
+    (s.rawScores !== undefined && (!s.rawScores || !Object.values(s.rawScores).every((v) => number(v))))))
+    throw new Error("The backup contains invalid expression quality data.");
+  if (e.emotionCorrection !== undefined && (!e.emotionCorrection ||
+    !Array.isArray(e.emotionCorrection.labels) || e.emotionCorrection.labels.length > 6 ||
+    new Set(e.emotionCorrection.labels).size !== e.emotionCorrection.labels.length ||
+    !e.emotionCorrection.labels.every((id) => emotionDefinitions.some((emotion) => emotion.id === id)) ||
+    typeof e.emotionCorrection.updatedAt !== "string" || !Number.isFinite(Date.parse(e.emotionCorrection.updatedAt))))
+    throw new Error("The backup contains invalid emotion corrections.");
+  if (e.transcript !== undefined && (!e.transcript || typeof e.transcript.text !== "string" ||
+    !Array.isArray(e.transcript.passages) || e.transcript.passages.length > 5000 ||
+    !e.transcript.passages.every((p) => p && typeof p.id === "string" && p.id.length <= 100 && typeof p.text === "string" &&
+      p.timing === "approximate" && number(p.start, 0, duration + 1) && number(p.end, p.start, duration + 1)) ||
+    new Set(e.transcript.passages.map((p) => p.id)).size !== e.transcript.passages.length ||
+    !chronological(e.transcript.passages.flatMap((p) => [p.start, p.end]))))
+    throw new Error("The backup contains invalid transcript passages.");
+  if (e.acoustics !== undefined && (!Array.isArray(e.acoustics) || e.acoustics.length > 10000 ||
+    !e.acoustics.every((s) => s && number(s.at, 0, duration + 1) && number(s.rms) && number(s.clipping) &&
+      number(s.periodicity) && number(s.zeroCrossingRate) && number(s.quality) &&
+      (s.pitchHz === null || number(s.pitchHz, 60, 500))) || !chronological(e.acoustics.map((s) => s.at))))
+    throw new Error("The backup contains invalid acoustic data.");
   if (
     !e.decoration ||
     !["serif", "sans", "handwritten", "mono"].includes(e.decoration.font) ||
@@ -149,7 +176,7 @@ export async function importEntries(file: File) {
   const data = JSON.parse(await file.text());
   if (
     data.format !== "leap-journal" ||
-    ![1, 2].includes(data.version) ||
+    ![1, 2, 3].includes(data.version) ||
     !Array.isArray(data.entries) ||
     data.entries.length > 10000
   )

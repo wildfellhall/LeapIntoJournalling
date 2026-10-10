@@ -8,3 +8,4 @@ playwright-report/
 .openai/
 .vercel/
 public/models/
+experiments/text-candidate/

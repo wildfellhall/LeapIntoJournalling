@@ -56,7 +56,7 @@ test("sentiment works offline, saves its version and makes no external requests"
       }),
   );
   expect(saved.analysis.method).toBe("local-vader-emotion");
-  expect(saved.analysis.version).toBe("vader-1.1.3/sentences-1/goemotions-linear-1/segments-1");
+  expect(saved.analysis.version).toBe("vader-1.1.3/sentences-1/goemotions-linear-1/segments-2");
   expect(saved.analysis.emotions.sadness).toBeGreaterThan(0);
   expect(saved.analysis.score).toBeLessThan(0);
   expect(saved.text).toBe("I don’t feel happy. I am devastated.");

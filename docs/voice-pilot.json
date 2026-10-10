@@ -1,0 +1,752 @@
+{
+  "dataset": "CREMA-D",
+  "revision": "1658cd342dff90010aa843eaeebd53610a08b1dc",
+  "license": "ODbL-1.0 database; DbCL-1.0 individual contents",
+  "labels": [
+    "anger",
+    "disgust",
+    "fear",
+    "joy",
+    "neutral",
+    "sadness"
+  ],
+  "split": {
+    "trainActors": [
+      1001,
+      1002,
+      1003,
+      1004,
+      1005,
+      1006,
+      1007,
+      1008,
+      1009,
+      1010,
+      1011,
+      1012
+    ],
+    "devActors": [
+      1013,
+      1014,
+      1015
+    ],
+    "testActors": [
+      1016,
+      1017,
+      1018
+    ]
+  },
+  "bytesDownloaded": 8363596,
+  "features": 29,
+  "parameters": 180,
+  "penaltySelectedOnDev": 10,
+  "validation": {
+    "examples": 18,
+    "accuracy": 0.4444,
+    "macroF1": 0.4437,
+    "confusionMatrix": [
+      [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        1,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        1,
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        2,
+        0
+      ],
+      [
+        0,
+        2,
+        0,
+        0,
+        0,
+        1
+      ]
+    ]
+  },
+  "test": {
+    "examples": 18,
+    "accuracy": 0.2222,
+    "macroF1": 0.1922,
+    "confusionMatrix": [
+      [
+        0,
+        0,
+        1,
+        0,
+        2,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        2,
+        1
+      ],
+      [
+        0,
+        0,
+        2,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        1,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        1,
+        2
+      ]
+    ]
+  },
+  "gainNoiseStress": {
+    "examples": 18,
+    "accuracy": 0.1111,
+    "macroF1": 0.0556,
+    "confusionMatrix": [
+      [
+        0,
+        1,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        3,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        1,
+        0,
+        0,
+        0
+      ]
+    ]
+  },
+  "productionEnabled": false,
+  "limitations": "Pilot on 18 actors reading one sentence; only 3 held-out actors. Acted labels, not natural journal feelings. Synthetic noise is not real microphone validation. No surprise label. Insufficient evidence for deployment; weights are not bundled in the app.",
+  "files": [
+    {
+      "file": "1001_DFA_ANG_XX.wav",
+      "bytes": 72862,
+      "sha256": "c6f94b2592487c7556bd86df7df6e8f4420d1b9c11414aeec9d8e5e640b51495"
+    },
+    {
+      "file": "1001_DFA_DIS_XX.wav",
+      "bytes": 74786,
+      "sha256": "c992e624c48a6119b5635ef7b606aea28d45d02c397b9bd85f7e5a2c2656ac65"
+    },
+    {
+      "file": "1001_DFA_FEA_XX.wav",
+      "bytes": 69446,
+      "sha256": "cc84aa476b106f71364c079ac3cf08448d2bc0b5ac79deb7ec10cbe69c19d74c"
+    },
+    {
+      "file": "1001_DFA_HAP_XX.wav",
+      "bytes": 59836,
+      "sha256": "91d63d7a792a37b2ff8ac6267d3e5364bc1b10d5b0e0be288c0af0534d4fdae5"
+    },
+    {
+      "file": "1001_DFA_NEU_XX.wav",
+      "bytes": 65176,
+      "sha256": "95e32bd83c449d26afb653c5451fa0389a83b1245c24385778cd02a18cb50cb6"
+    },
+    {
+      "file": "1001_DFA_SAD_XX.wav",
+      "bytes": 64108,
+      "sha256": "c75f74e03ae5783830733519c806c85996ca0bd833e17b535f8830166bc002e9"
+    },
+    {
+      "file": "1002_DFA_ANG_XX.wav",
+      "bytes": 82260,
+      "sha256": "31eda0c90ebd72b7f311ab3b980258c6d094e08be96da3d15fbd6a7e19ff91d8"
+    },
+    {
+      "file": "1002_DFA_DIS_XX.wav",
+      "bytes": 81192,
+      "sha256": "3a398b799e48b8564ad1733ef2845ef898376d5ce7f86167aa3f4205c590498e"
+    },
+    {
+      "file": "1002_DFA_FEA_XX.wav",
+      "bytes": 87598,
+      "sha256": "c4446bd1082e27ee04dcf45432b1cffc8baf5840d851d7f3fd2f3c9d2c04be98"
+    },
+    {
+      "file": "1002_DFA_HAP_XX.wav",
+      "bytes": 70514,
+      "sha256": "f94a5f827691550aa0afaf5415e28e281c2beeb413245326aa650446dd0d7289"
+    },
+    {
+      "file": "1002_DFA_NEU_XX.wav",
+      "bytes": 80124,
+      "sha256": "3ee31d38d8e2a3216975505fe111faef333b02adfe508d0567ae4d31b9911799"
+    },
+    {
+      "file": "1002_DFA_SAD_XX.wav",
+      "bytes": 75852,
+      "sha256": "c875b32f45ba7c98b048985321e75a6d3eac2d5e3d0beca5aee1eb0c79c0b12c"
+    },
+    {
+      "file": "1003_DFA_ANG_XX.wav",
+      "bytes": 100410,
+      "sha256": "ff499b82dc7d37e73c7b6ee45fefe04cbad21c8d5cf64f81fdc6eb92b2c4ad1b"
+    },
+    {
+      "file": "1003_DFA_DIS_XX.wav",
+      "bytes": 103614,
+      "sha256": "3f4fcc9473721cbfae6d6c760e9f70f56b9ae595920ca2e750e3411456ea466d"
+    },
+    {
+      "file": "1003_DFA_FEA_XX.wav",
+      "bytes": 98276,
+      "sha256": "5971a8c6fcf9853b58ad3c5e2867a61b927ca1cf40b13199f1aed01053fa2c50"
+    },
+    {
+      "file": "1003_DFA_HAP_XX.wav",
+      "bytes": 104682,
+      "sha256": "3d7dbb8ae0429218722a78a3182f04e652bdce82359f8ff563ede1ceccb09013"
+    },
+    {
+      "file": "1003_DFA_NEU_XX.wav",
+      "bytes": 103614,
+      "sha256": "fab10bae2babdb395f996495fe584d5777087009de4df65086b8f391b720e71f"
+    },
+    {
+      "file": "1003_DFA_SAD_XX.wav",
+      "bytes": 102546,
+      "sha256": "c611cb037909dd0dbb3a8e892ff109e71f2bea0c0d09750e4cfb43b9399f5600"
+    },
+    {
+      "file": "1004_DFA_ANG_XX.wav",
+      "bytes": 98276,
+      "sha256": "8d472e0203c59bda4cb2062d32a3b719029048aef85e8326c7d9100ac6730f95"
+    },
+    {
+      "file": "1004_DFA_DIS_XX.wav",
+      "bytes": 92936,
+      "sha256": "cd2d70a635c660b5a70e4f6c14677d4c0cdac13af07b5c1d29c0004063628215"
+    },
+    {
+      "file": "1004_DFA_FEA_XX.wav",
+      "bytes": 97208,
+      "sha256": "a533e724dcf27f404b328a8260f9a531f12d0a32fdf3b2c87af6580f700773cd"
+    },
+    {
+      "file": "1004_DFA_HAP_XX.wav",
+      "bytes": 87598,
+      "sha256": "76a164bf558b556e76e3b12ef359c71132ca648ae2a78e76a4b2fdc1d76d4897"
+    },
+    {
+      "file": "1004_DFA_NEU_XX.wav",
+      "bytes": 99344,
+      "sha256": "eb04a9df5d8f38101685965c704352dd7fa8d662087002fcc2b5f0a5bf2f1a8b"
+    },
+    {
+      "file": "1004_DFA_SAD_XX.wav",
+      "bytes": 90802,
+      "sha256": "e937c72551290f4df34065e7863881f93c53518cb9f13055daeeda0f5ab04428"
+    },
+    {
+      "file": "1005_DFA_ANG_XX.wav",
+      "bytes": 83328,
+      "sha256": "50c380fe2542a3ba6e3b4a0c6659a0c04859924ed89085300c55801ceb90cb8f"
+    },
+    {
+      "file": "1005_DFA_DIS_XX.wav",
+      "bytes": 87598,
+      "sha256": "e5eddfc2cb40b94a8609ae1a5b81175c237ade0a9fe93ce22c8ad1daa86d52e2"
+    },
+    {
+      "file": "1005_DFA_FEA_XX.wav",
+      "bytes": 79056,
+      "sha256": "2b68ea8c2c12f2e29486df88aed1456078095b1cf1f331b868d7ba8f6480a8a8"
+    },
+    {
+      "file": "1005_DFA_HAP_XX.wav",
+      "bytes": 82260,
+      "sha256": "ce3624c8291017f09ecb24528429b058c51d968be9c62594d680c079350cea71"
+    },
+    {
+      "file": "1005_DFA_NEU_XX.wav",
+      "bytes": 99344,
+      "sha256": "88ce40526f75cb7e2e107a424eff79fc440666b43e240db42544485be37edba0"
+    },
+    {
+      "file": "1005_DFA_SAD_XX.wav",
+      "bytes": 97208,
+      "sha256": "c869ff1d7f539fd1160012f768c502d5728b2a77f1eeba8992b3abb4d7153ba3"
+    },
+    {
+      "file": "1006_DFA_ANG_XX.wav",
+      "bytes": 83328,
+      "sha256": "c8be1f334bd7f4007585c26b47be93a4630b92114d8ed8ea5b18bf9792b1964a"
+    },
+    {
+      "file": "1006_DFA_DIS_XX.wav",
+      "bytes": 88666,
+      "sha256": "35f083676b49be4ca2216124764ea65d4e1d1d8bd3ae86ea9202a73b39d0602a"
+    },
+    {
+      "file": "1006_DFA_FEA_XX.wav",
+      "bytes": 75852,
+      "sha256": "4c8c5bf2738262602ae8256e2343ba91bb6bd29098f4440b1ee5dd230d63f007"
+    },
+    {
+      "file": "1006_DFA_HAP_XX.wav",
+      "bytes": 73718,
+      "sha256": "2dc2fcf35696175951c9039af94255b90ea2fcd3609f5e26ad4973df103dca2a"
+    },
+    {
+      "file": "1006_DFA_NEU_XX.wav",
+      "bytes": 82260,
+      "sha256": "400318dbc83d5d4382d7bd0e3ad43c0c30fe53c6de22426b48259b83aec11d1a"
+    },
+    {
+      "file": "1006_DFA_SAD_XX.wav",
+      "bytes": 85462,
+      "sha256": "78bcfe4b5321e88ed051cf4d4a6d4bf19858b064b0584f775835b35784dc26d0"
+    },
+    {
+      "file": "1007_DFA_ANG_XX.wav",
+      "bytes": 80124,
+      "sha256": "8af7a9ef3fa8b4b0655f2fffbba25d888c3ab64fbeb60198fead70399db59a6e"
+    },
+    {
+      "file": "1007_DFA_DIS_XX.wav",
+      "bytes": 91868,
+      "sha256": "c3fb9d465ece35dbba3b280d23e13bf943cea0e4f17809c3563e92c51962c55a"
+    },
+    {
+      "file": "1007_DFA_FEA_XX.wav",
+      "bytes": 87598,
+      "sha256": "d015165e4ae40148be64fd77e496ff2d84a2bf614cca7a20f5a3caaf0c8d221b"
+    },
+    {
+      "file": "1007_DFA_HAP_XX.wav",
+      "bytes": 70514,
+      "sha256": "3143cda862e26fabae47955c859230c7f3b82c48f678c3f24f57e192c0afffb9"
+    },
+    {
+      "file": "1007_DFA_NEU_XX.wav",
+      "bytes": 84394,
+      "sha256": "a5c8835e306d5ab000c8f8094d17ceb0e021baaa2aeb5396fe39f56c1f0adfc8"
+    },
+    {
+      "file": "1007_DFA_SAD_XX.wav",
+      "bytes": 69446,
+      "sha256": "92dedd5f1a56c98c237c1cfdafa8d5c0199f950e9d03cc329548b1aec022ab31"
+    },
+    {
+      "file": "1008_DFA_ANG_XX.wav",
+      "bytes": 99344,
+      "sha256": "608ecbeb205db75e9d44daddc748dc4084b6862542f4736205f06dea3a5a8877"
+    },
+    {
+      "file": "1008_DFA_DIS_XX.wav",
+      "bytes": 116426,
+      "sha256": "95e797b77a59d4b9cacf1950d4f471021c035e9f0c6ac56a34c5a09a3794f9a2"
+    },
+    {
+      "file": "1008_DFA_FEA_XX.wav",
+      "bytes": 82260,
+      "sha256": "eaf17cabfc77b82c584e5a0ff97ce865726cf43159e24c35679c6f36c0a2bf94"
+    },
+    {
+      "file": "1008_DFA_HAP_XX.wav",
+      "bytes": 102546,
+      "sha256": "c542c644ad9dbcd4669f5bbeeec76fac6e1ffdf6d786efd9f8d1c58dca3c7531"
+    },
+    {
+      "file": "1008_DFA_NEU_XX.wav",
+      "bytes": 76920,
+      "sha256": "bd8c3161758c3e8139399148f7dce334206fe3e9cc2e7b8b817a90146628e6d3"
+    },
+    {
+      "file": "1008_DFA_SAD_XX.wav",
+      "bytes": 119630,
+      "sha256": "a7f8f787deb28bb720fa2dcd98b882f1ba795f948972ecd10acd5d0943de42e1"
+    },
+    {
+      "file": "1009_DFA_ANG_XX.wav",
+      "bytes": 65176,
+      "sha256": "800d0e8171d70ae083a34dacb9107aca397e89968423cd496c593015880a6155"
+    },
+    {
+      "file": "1009_DFA_DIS_XX.wav",
+      "bytes": 82260,
+      "sha256": "5d57a98b5065241115800fd13ba6bf1cc47776194e13f4e86d9cbf69aa2dd05b"
+    },
+    {
+      "file": "1009_DFA_FEA_XX.wav",
+      "bytes": 81192,
+      "sha256": "93eb0e81473188dbc3213eb9c3b29f89c84e583910e40c9b47cf7d9b0fadf00d"
+    },
+    {
+      "file": "1009_DFA_HAP_XX.wav",
+      "bytes": 76920,
+      "sha256": "e5e5c677567f56962abc9f5179b76996c941ca32590cea0cf11f2dbc2056224c"
+    },
+    {
+      "file": "1009_DFA_NEU_XX.wav",
+      "bytes": 76920,
+      "sha256": "82d76b44b0ddbdbc83dace706be6d7cadd90c98cee39a34c719ead6d2b2d70e5"
+    },
+    {
+      "file": "1009_DFA_SAD_XX.wav",
+      "bytes": 99344,
+      "sha256": "d3bc710be925c960375d838ea1e507cadce5183d38f996fd017f25ba31069858"
+    },
+    {
+      "file": "1010_DFA_ANG_XX.wav",
+      "bytes": 70514,
+      "sha256": "48f11450a1bf64f2e42f33ba0893059baf9b75f3c43563405628f3efc144c7fa"
+    },
+    {
+      "file": "1010_DFA_DIS_XX.wav",
+      "bytes": 84394,
+      "sha256": "b29e2f187952875be52518538ce01e7a2844570a8f377da012a7175aaeeca3fd"
+    },
+    {
+      "file": "1010_DFA_FEA_XX.wav",
+      "bytes": 72650,
+      "sha256": "e4eb0179dcedc5ed73451ff2c0ab0a0f226ee72aed0c6f2caf6f2ea5d3e13b30"
+    },
+    {
+      "file": "1010_DFA_HAP_XX.wav",
+      "bytes": 60904,
+      "sha256": "f39ef9d665b781244cacb2f4e859d7e5397893085a1bbb16172bad15f325d0da"
+    },
+    {
+      "file": "1010_DFA_NEU_XX.wav",
+      "bytes": 81192,
+      "sha256": "901b38c13c81c22f1c01cdb1e9b15aab6aca5091ebad9c6b1e989a739105ecfd"
+    },
+    {
+      "file": "1010_DFA_SAD_XX.wav",
+      "bytes": 69446,
+      "sha256": "1311471e142a89a02df42dab801fcfb4044cff7d40a95a97f13de7471d59269f"
+    },
+    {
+      "file": "1011_DFA_ANG_XX.wav",
+      "bytes": 95072,
+      "sha256": "c5385fa3a4c062ae4696e1ed165f5f6a2529406c6b3fcdeb927d697198fd56bb"
+    },
+    {
+      "file": "1011_DFA_DIS_XX.wav",
+      "bytes": 81192,
+      "sha256": "4a34408c41bb903a0dfc0ff455019e399fb21827d7926356e084a4eaf7c56891"
+    },
+    {
+      "file": "1011_DFA_FEA_XX.wav",
+      "bytes": 65176,
+      "sha256": "137a518d6606e1677a14d6bf23434e30019a566d18631b5498268abcdde1c595"
+    },
+    {
+      "file": "1011_DFA_HAP_XX.wav",
+      "bytes": 65176,
+      "sha256": "3e05c1ab48df097bcf6e8437c1e6765d70d31823af9e040fffb32a08d11ec984"
+    },
+    {
+      "file": "1011_DFA_NEU_XX.wav",
+      "bytes": 79056,
+      "sha256": "d4dce1226c9cd4e6e3a07f8a0203bc475915a8808a36d95e4b85ee2fe9c03191"
+    },
+    {
+      "file": "1011_DFA_SAD_XX.wav",
+      "bytes": 80124,
+      "sha256": "97d9ce1301872fe04740b91825307699d7579a71b711f1bd613fd3482ecaea89"
+    },
+    {
+      "file": "1012_DFA_ANG_XX.wav",
+      "bytes": 86530,
+      "sha256": "b4151c58f6240a62f14f5206675a1d56a974ed442085ae508196467a4ba3d9ea"
+    },
+    {
+      "file": "1012_DFA_DIS_XX.wav",
+      "bytes": 66244,
+      "sha256": "13eec195c117c74f07099b56938fcd10063fa5be259299ccbb5acdb3651ab18d"
+    },
+    {
+      "file": "1012_DFA_FEA_XX.wav",
+      "bytes": 66244,
+      "sha256": "b9808ac8810f134469871df862570edc8c305ac57d8b566334056926dd5841e4"
+    },
+    {
+      "file": "1012_DFA_HAP_XX.wav",
+      "bytes": 74786,
+      "sha256": "a8408055452203a13cd1e77b8add6565aa1a41d254f25fdbbf89fb86bb792d74"
+    },
+    {
+      "file": "1012_DFA_NEU_XX.wav",
+      "bytes": 73718,
+      "sha256": "a748592e2eafd3c2ff92318d41271e3ccc644c198c370d17e118cb8dbf1324cd"
+    },
+    {
+      "file": "1012_DFA_SAD_XX.wav",
+      "bytes": 72650,
+      "sha256": "8816d9293097f3bf85ec532acc7263a19abde2c27d27ac568a6badc1b99e7ae5"
+    },
+    {
+      "file": "1013_DFA_ANG_XX.wav",
+      "bytes": 87598,
+      "sha256": "4d3fbfd9710e554a4ffa1dfd42bf5a05e1a51f56b0f4f0d20af997da6ffcd46c"
+    },
+    {
+      "file": "1013_DFA_DIS_XX.wav",
+      "bytes": 72650,
+      "sha256": "9ccdee5648209f8b91660367c9a9e9f01f3fe4928814ffa0d6de75f5df052e74"
+    },
+    {
+      "file": "1013_DFA_FEA_XX.wav",
+      "bytes": 58770,
+      "sha256": "05ac2de4cce089e9e70789b8109bccbd96ae2dc127daacc07d6b99c3fd1fabe4"
+    },
+    {
+      "file": "1013_DFA_HAP_XX.wav",
+      "bytes": 66244,
+      "sha256": "5b5112e3c18b77fd01d433e3233507a04280bff70925cf7b1bb280ebf01fa01e"
+    },
+    {
+      "file": "1013_DFA_NEU_XX.wav",
+      "bytes": 74786,
+      "sha256": "4d86e78492b7215cde5a742f3295c462d70e90e5bd5300a8bf764e1d7f4ea5f7"
+    },
+    {
+      "file": "1013_DFA_SAD_XX.wav",
+      "bytes": 72862,
+      "sha256": "788c96ab3b9ea48c45bde637af221bfdd1a7bca594c67cb72b54d0fad3391eb4"
+    },
+    {
+      "file": "1014_DFA_ANG_XX.wav",
+      "bytes": 75852,
+      "sha256": "9f04bd0ff2bd5cfb29abd13167236865f4e905e5eb6eea60a3006b6fa7831eef"
+    },
+    {
+      "file": "1014_DFA_DIS_XX.wav",
+      "bytes": 66244,
+      "sha256": "401fcb8c5fb7616de35cffb7b555a6acd15213e846bfe33428b9a20f3dd793b0"
+    },
+    {
+      "file": "1014_DFA_FEA_XX.wav",
+      "bytes": 87598,
+      "sha256": "51240b654ff95142403b89a8d0f0a2183701b421367a433306a7c776f7c42a4c"
+    },
+    {
+      "file": "1014_DFA_HAP_XX.wav",
+      "bytes": 72650,
+      "sha256": "5b35244c9d3cbad6acec12be8f0a489de3996abba9ca6dc52bb0160faa138a30"
+    },
+    {
+      "file": "1014_DFA_NEU_XX.wav",
+      "bytes": 80124,
+      "sha256": "af7c03437ca3719d561d58ec29a274cb2c2c26e390990439f40ee530ae85a547"
+    },
+    {
+      "file": "1014_DFA_SAD_XX.wav",
+      "bytes": 63040,
+      "sha256": "cc40e54c1a8c68f78aa7783bedee69757826b4ab2f970cc2027c386ba547bc99"
+    },
+    {
+      "file": "1015_DFA_ANG_XX.wav",
+      "bytes": 72862,
+      "sha256": "46151b97a45224bab7c83fb3e6d876d50984b71b0dd6f6050786a4d72d4c8ec4"
+    },
+    {
+      "file": "1015_DFA_DIS_XX.wav",
+      "bytes": 68378,
+      "sha256": "3bc97426a4c5bdc6d1ab85abe05231f2b657e86463c953090b9dedbcba2307e7"
+    },
+    {
+      "file": "1015_DFA_FEA_XX.wav",
+      "bytes": 65176,
+      "sha256": "21a3623f8d1bb7711440580d02e779e2766c744a7fe9cfa83fb6b022f4623718"
+    },
+    {
+      "file": "1015_DFA_HAP_XX.wav",
+      "bytes": 56634,
+      "sha256": "d713976836d034a813dd1f959615187ba8e2cfb399a4c450fac61a30087b6df9"
+    },
+    {
+      "file": "1015_DFA_NEU_XX.wav",
+      "bytes": 56634,
+      "sha256": "a791efa4e80971f4049373b3d775fef01146faf37a37f6a8bd018f2c6c56dc73"
+    },
+    {
+      "file": "1015_DFA_SAD_XX.wav",
+      "bytes": 67312,
+      "sha256": "0ccd381cecc7501961174a036a48b16bad1996df47ed0435b23108d3731fd959"
+    },
+    {
+      "file": "1016_DFA_ANG_XX.wav",
+      "bytes": 64108,
+      "sha256": "50fe7d9d361552907fbb74cf268669e71452c916abff3bf2dac793fa3c6a21a6"
+    },
+    {
+      "file": "1016_DFA_DIS_XX.wav",
+      "bytes": 76920,
+      "sha256": "54bafe1810fbe669e581ead41549e72cdbd66d5462e1a92ad5d97c6358c48ab0"
+    },
+    {
+      "file": "1016_DFA_FEA_XX.wav",
+      "bytes": 79056,
+      "sha256": "b7092052df906361c0035905305e34f010551a466cc1ac69a80985acbc7dd2e8"
+    },
+    {
+      "file": "1016_DFA_HAP_XX.wav",
+      "bytes": 60904,
+      "sha256": "feb6918b709651ec4083a988fe82c9f408168f1f9850b4083ddc23985a94f782"
+    },
+    {
+      "file": "1016_DFA_NEU_XX.wav",
+      "bytes": 61972,
+      "sha256": "a98b8bec9115ebea7fd87fb0b5cc4356ff600943a916a186d15766af1bdda1a6"
+    },
+    {
+      "file": "1016_DFA_SAD_XX.wav",
+      "bytes": 75852,
+      "sha256": "7cea202c61de2bba716165e8446bc1e5b0795837e07d58994b655457a2fe7b4d"
+    },
+    {
+      "file": "1017_DFA_ANG_XX.wav",
+      "bytes": 51296,
+      "sha256": "b94941f8f3bf9ddb5994e701b4ef9ced913d3fd4a3aa0f6032bcc5e5f2005dc2"
+    },
+    {
+      "file": "1017_DFA_DIS_XX.wav",
+      "bytes": 51296,
+      "sha256": "2c45f3c68df36d820d5c018b0c1f0efdc14ac62278e4ced39597ed3daac0e6a3"
+    },
+    {
+      "file": "1017_DFA_FEA_XX.wav",
+      "bytes": 43820,
+      "sha256": "a745d2b615532b8ad7049bcdc7f8caa63ec5cec901b14d2caadca5cc436c31c0"
+    },
+    {
+      "file": "1017_DFA_HAP_XX.wav",
+      "bytes": 60904,
+      "sha256": "3bea22e14335e22d41a11cf77a1dd8601e3e5e0c67d3f37afa2e6a6b7ca3e1e8"
+    },
+    {
+      "file": "1017_DFA_NEU_XX.wav",
+      "bytes": 55566,
+      "sha256": "16d3a0c03aa8de22c7a7de35222f57dfacfab807095c40666997b589bf294a36"
+    },
+    {
+      "file": "1017_DFA_SAD_XX.wav",
+      "bytes": 53430,
+      "sha256": "5bbcd410cbd2d4462c2a32c3eb839580c810392d88f5c1ae83e0a7be51437d89"
+    },
+    {
+      "file": "1018_DFA_ANG_XX.wav",
+      "bytes": 63040,
+      "sha256": "932257440b0d092f63f22c3d8d8e512a98bc6cd3e27ba491edfda69b05c7b4b6"
+    },
+    {
+      "file": "1018_DFA_DIS_XX.wav",
+      "bytes": 73718,
+      "sha256": "4257b390fd4647b9d00e3c5e8a68b7fb534b3b5714cbd25a1779e10fc9ca101b"
+    },
+    {
+      "file": "1018_DFA_FEA_XX.wav",
+      "bytes": 68378,
+      "sha256": "d072e11853ea3bfcf4851f32599f1c5c9e6e92aae13d89d7e19292440c49b5ee"
+    },
+    {
+      "file": "1018_DFA_HAP_XX.wav",
+      "bytes": 52362,
+      "sha256": "a3a6f827be71896f34a9f0426607aeda8901f9a6cd5f4e3befb980228225e70a"
+    },
+    {
+      "file": "1018_DFA_NEU_XX.wav",
+      "bytes": 64108,
+      "sha256": "433a9db9771aba8b484899192a7029960ca8bf9b13dbfedaed71bd763b3224fa"
+    },
+    {
+      "file": "1018_DFA_SAD_XX.wav",
+      "bytes": 52362,
+      "sha256": "336364225c0edcf721d061e057134d8cba07b6160390bfa097e516aba2e9b210"
+    }
+  ]
+}

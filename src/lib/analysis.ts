@@ -1,3 +1,4 @@
+import { entryEmotions, emotionReliability, comparableFace } from "./signals";
 import { moods, type Analysis, type Entry } from "./types";
 import { assessSentiment, SENTIMENT_VERSION } from "./sentiment";
 import { classifyEmotions, emotionLabels, EMOTION_VERSION } from "./emotions";
@@ -58,15 +59,6 @@ export function analysisMethodLabel(analysis: Analysis) {
 export function entryScore(e: Entry) {
   return e.mood ? moods.find((m) => m.id === e.mood)!.value : e.analysis.score;
 }
-function expressionVector(e: Entry) {
-  const v: Record<string, number> = Object.create(null);
-  e.expressions.forEach((sample) =>
-    Object.entries(sample.scores).forEach(
-      ([k, n]) => (v[k] = (v[k] || 0) + n / e.expressions.length),
-    ),
-  );
-  return v;
-}
 function cosine(a: Record<string, number>, b: Record<string, number>) {
   const dot = Object.keys(a).reduce((s, k) => s + a[k] * (b[k] || 0), 0);
   const norm = Math.sqrt(
@@ -97,21 +89,20 @@ export function similarity(a: Entry, b: Entry, corpus: Entry[]) {
     return counts;
   };
   const content = cosine(vector(a), vector(b));
-  const textAvailable = emotionLabels(a.analysis.emotions).length > 0 &&
-    emotionLabels(b.analysis.emotions).length > 0;
-  const textEmotion = textAvailable ? cosine(a.analysis.emotions, b.analysis.emotions) : null;
-  // A check-in describes mood, not a categorical emotion. Keep both signals.
-  // Missing/uncertain text is not treated as a matching neutral emotion.
-  const moodAvailable = Boolean(a.mood && b.mood);
-  const mood = moodAvailable ? 1 - Math.abs(entryScore(a) - entryScore(b)) / 2 : null;
-  const emotion = textEmotion !== null && mood !== null ? (textEmotion + mood) / 2 : textEmotion ?? mood;
-  const faceAvailable = a.expressions.length > 0 && b.expressions.length > 0;
-  const face = faceAvailable
-    ? cosine(expressionVector(a), expressionVector(b))
-    : 0;
-  const emotionWeight = faceAvailable ? 0.25 : 0.35;
-  const availableWeight = 0.65 + (emotion !== null ? emotionWeight : 0) + (faceAvailable ? 0.1 : 0);
-  const score = (content * 0.65 + (emotion ?? 0) * emotionWeight + face * 0.1) / availableWeight;
+  const aEmotions = entryEmotions(a), bEmotions = entryEmotions(b);
+  const textAvailable = emotionLabels(aEmotions).length > 0 && emotionLabels(bEmotions).length > 0;
+  const textEmotion = textAvailable ? cosine(aEmotions, bEmotions) : null;
+  const textQuality = Math.sqrt(emotionReliability(a) * emotionReliability(b));
+  const mood = a.mood && b.mood ? 1 - Math.abs(entryScore(a) - entryScore(b)) / 2 : null;
+  const emotion = textEmotion !== null && mood !== null ? (textEmotion * textQuality + mood) / (1 + textQuality) : textEmotion ?? mood;
+  const aFace = comparableFace(a), bFace = comparableFace(b);
+  const faceQuality = Math.sqrt(aFace.quality * bFace.quality);
+  const faceAvailable = faceQuality > 0;
+  const face = faceAvailable ? cosine(aFace.scores, bFace.scores) : 0;
+  const faceWeight = 0.1 * faceQuality;
+  const emotionWeight = (0.35 - faceWeight) * (mood !== null ? 1 : textQuality);
+  const availableWeight = 0.65 + (emotion !== null ? emotionWeight : 0) + faceWeight;
+  const score = (content * 0.65 + (emotion ?? 0) * emotionWeight + face * faceWeight) / availableWeight;
   const shared = a.analysis.keywords.filter((w) =>
     b.analysis.keywords.includes(w),
   );
@@ -121,8 +112,8 @@ export function similarity(a: Entry, b: Entry, corpus: Entry[]) {
     emotion,
     textEmotion,
     mood,
-    sharedEmotions: emotionLabels(a.analysis.emotions)
-      .filter(({ id }) => (b.analysis.emotions[id] || 0) > 0)
+    sharedEmotions: emotionLabels(aEmotions)
+      .filter(({ id }) => (bEmotions[id] || 0) > 0)
       .map(({ label }) => label),
     face: faceAvailable ? face : null,
     shared,

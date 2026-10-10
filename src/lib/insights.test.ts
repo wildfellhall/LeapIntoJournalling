@@ -100,7 +100,7 @@ describe("insights report data", () => {
     expect(summary.emotionTimeline[2]).toMatchObject({ sadness: 1, joy: 1, fear: 0 });
     expect(summary.distribution).toMatchObject([{ id: "calm", count: 1 }]);
     const report = JSON.stringify(createReportDefinition(summary, { includeEntries: false, note: "" }, now));
-    expect(report).toContain("Text emotion estimates");
+    expect(report).toContain("Emotion labels");
     expect(report).toContain("Sadness");
     expect(report).not.toContain(mixed.text);
   });

@@ -1,0 +1,299 @@
+{
+  "provenance": "Original synthetic journal-style examples authored for this project, not private journals or human-validated data. Training/development examples are separate from regression fixtures.",
+  "examples": [
+    {
+      "split": "train",
+      "text": "The bus ride home felt lighter after finally finishing the project.",
+      "labels": [
+        "joy"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I keep smiling when I remember the little celebration we had at dinner.",
+      "labels": [
+        "joy"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "Seeing my old friends brought warmth to an otherwise ordinary afternoon.",
+      "labels": [
+        "joy"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I felt proud of myself for trying something unfamiliar today.",
+      "labels": [
+        "joy"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "Tonight I am grateful for the people who showed up for me.",
+      "labels": [
+        "joy"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "I feel relieved that the test is over and excited about the weekend.",
+      "labels": [
+        "joy"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "The quiet apartment feels empty without my old roommate here.",
+      "labels": [
+        "sadness"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I miss those evenings together and the loss keeps catching up with me.",
+      "labels": [
+        "sadness"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I cried in the car on the way home from saying goodbye.",
+      "labels": [
+        "sadness"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I felt lonely sitting with everyone at lunch today.",
+      "labels": [
+        "sadness"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "Tonight I am heartbroken about how our conversation ended.",
+      "labels": [
+        "sadness"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "I feel disappointed in how the meeting turned out.",
+      "labels": [
+        "sadness"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "Being interrupted again made me want to slam the door.",
+      "labels": [
+        "anger"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "The unfair way I was treated at work has been eating at me all evening.",
+      "labels": [
+        "anger"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I resent having to clean up the same mess again after being ignored.",
+      "labels": [
+        "anger"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I felt furious when my boundaries were dismissed today.",
+      "labels": [
+        "anger"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "Tonight I am irritated by the constant demands on my time.",
+      "labels": [
+        "anger"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "I feel frustrated about being blamed for something I did not do.",
+      "labels": [
+        "anger"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "My thoughts keep racing through everything that could go wrong at the appointment.",
+      "labels": [
+        "fear"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "The uncertainty about the exam kept me awake most of the night.",
+      "labels": [
+        "fear"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "My hands were shaking before I walked into the interview room.",
+      "labels": [
+        "fear"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I felt terrified when I heard someone outside my door.",
+      "labels": [
+        "fear"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "Tonight I am anxious about the results arriving tomorrow.",
+      "labels": [
+        "fear"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "I feel nervous about starting somewhere new next week.",
+      "labels": [
+        "fear"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "The rotten food in the fridge made my stomach turn.",
+      "labels": [
+        "disgust"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "The smell from the dirty bin made me recoil and step outside.",
+      "labels": [
+        "disgust"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I cannot get the sight of that filthy kitchen out of my head.",
+      "labels": [
+        "disgust"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I felt repulsed by the cruel joke at dinner.",
+      "labels": [
+        "disgust"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "Tonight I am disgusted by how the animals were treated.",
+      "labels": [
+        "disgust"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "I feel sickened after seeing what was left in the sink.",
+      "labels": [
+        "disgust"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "The unexpected visit left me standing speechless in the doorway.",
+      "labels": [
+        "surprise"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I never saw that announcement coming and needed a moment to take it in.",
+      "labels": [
+        "surprise"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "The sudden change of plans caught me completely off guard.",
+      "labels": [
+        "surprise"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I felt astonished when the letter arrived this morning.",
+      "labels": [
+        "surprise"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "Tonight I am amazed by the news I received.",
+      "labels": [
+        "surprise"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "I feel surprised that the event was canceled without warning.",
+      "labels": [
+        "surprise"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I took the train to the office and brought lunch from home.",
+      "labels": [
+        "neutral"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "The appointment starts at nine and the shop closes at six.",
+      "labels": [
+        "neutral"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "I put the notebook on the desk beside the window.",
+      "labels": [
+        "neutral"
+      ]
+    },
+    {
+      "split": "train",
+      "text": "My shopping list contains bread and milk.",
+      "labels": [
+        "neutral"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "I moved the laundry into the cupboard this afternoon.",
+      "labels": [
+        "neutral"
+      ]
+    },
+    {
+      "split": "dev",
+      "text": "I checked the calendar and wrote down the meeting time.",
+      "labels": [
+        "neutral"
+      ]
+    }
+  ]
+}

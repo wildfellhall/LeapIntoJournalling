@@ -1,29 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import type { ExpressionSample, Mode } from "./types";
-// The Web Speech API is not yet part of the standard TypeScript DOM definitions.
-interface SpeechResultEvent {
-  resultIndex: number;
-  results: {
-    length: number;
-    [index: number]: { isFinal: boolean; 0: { transcript: string } };
-  };
-}
-interface Recognition {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  onresult: ((event: SpeechResultEvent) => void) | null;
-  onerror: ((event: { error: string }) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-  abort: () => void;
-}
-type SpeechWindow = Window & {
-  SpeechRecognition?: new () => Recognition;
-  webkitSpeechRecognition?: new () => Recognition;
-};
-export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
+import type { AcousticSample, ExpressionSample, Mode, TranscriptPassage } from "./types";
+import { acousticSample, faceQuality, smoothExpressions } from "./mediaSignals";
+import { localRecognition, speechAvailability, installSpeechPack, type Recognition, type SpeechAvailability } from "./localSpeech";
+export function useCapture(mode: Mode, onTranscript: (passage: TranscriptPassage) => void) {
   const videoRef = useRef<HTMLVideoElement>(null),
     streamRef = useRef<MediaStream | null>(null),
     recorderRef = useRef<MediaRecorder | null>(null);
@@ -34,6 +13,8 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
     mounted = useRef(true),
     samplesRef = useRef<ExpressionSample[]>([]),
     energiesRef = useRef<number[]>([]),
+    acousticRef = useRef<AcousticSample[]>([]),
+    generation = useRef(0),
     startRef = useRef(0),
     transcriptRef = useRef(onTranscript);
   transcriptRef.current = onTranscript;
@@ -45,20 +26,32 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
     [blob, setBlob] = useState<Blob | null>(null),
     [level, setLevel] = useState(0),
     [sampleCount, setSampleCount] = useState(0);
-  const speechSupported = !!(
-    (window as SpeechWindow).SpeechRecognition ||
-    (window as SpeechWindow).webkitSpeechRecognition
-  );
+  const [speechStatus, setSpeechStatus] = useState<SpeechAvailability>("checking");
+  const speechSupported = speechStatus === "available";
+  useEffect(() => {
+    let cancelled = false;
+    if (mode !== "writing") void speechAvailability().then((status) => { if (!cancelled) setSpeechStatus(status); });
+    return () => { cancelled = true; };
+  }, [mode]);
+  async function installSpeech() {
+    setSpeechStatus("downloading");
+    try {
+      const installed = await installSpeechPack();
+      const status = installed ? await speechAvailability() : "downloadable";
+      if (mounted.current) { setSpeechStatus(status); if (!installed) setError("The English speech pack could not be installed. You can add a transcript manually."); }
+    } catch { if (mounted.current) { setSpeechStatus("downloadable"); setError("Speech pack installation failed. You can try again or add a transcript manually."); } }
+  }
   function release() {
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
     contextRef.current?.close().catch(() => {});
     contextRef.current = null;
     clearInterval(intervalRef.current);
-    recognitionRef.current?.stop();
+    if (recognitionRef.current) { recognitionRef.current.onend = null; recognitionRef.current.onresult = null; try { recognitionRef.current.stop(); } catch { /* Already stopped. */ } }
     recognitionRef.current = null;
   }
   function stop() {
+    generation.current++;
     activeRef.current = false;
     const recorder = recorderRef.current;
     const finishing = !!recorder && recorder.state !== "inactive";
@@ -73,6 +66,7 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
     mounted.current = true;
     return () => {
       mounted.current = false;
+      generation.current++;
       activeRef.current = false;
       recognitionRef.current?.abort();
       if (recorderRef.current?.state === "recording")
@@ -80,11 +74,11 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
       release();
     };
   }, []);
-  async function trackExpressions() {
+  async function trackExpressions(session: number) {
     try {
       setFaceStatus("Loading expression model…");
       const { default: Human } = await import("@vladmandic/human");
-      if (!activeRef.current) return;
+      if (!activeRef.current || session !== generation.current) return;
       const human = new Human({
         modelBasePath: "/models/",
         backend: "webgl",
@@ -106,28 +100,38 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
         segmentation: { enabled: false },
       });
       await human.load();
-      while (activeRef.current && mounted.current) {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 64;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      let previous: ExpressionSample | undefined;
+      while (activeRef.current && mounted.current && session === generation.current) {
         const video = videoRef.current;
         if (video && video.readyState >= 2) {
           const result = await human.detect(video);
-          if (!activeRef.current) break;
+          if (!activeRef.current || session !== generation.current) break;
           const face = result.face[0];
-          if (face?.emotion?.length) {
-            const scores = Object.fromEntries(
-              face.emotion.map((e) => [e.emotion, e.score]),
-            );
-            samplesRef.current.push({
-              at: (Date.now() - startRef.current) / 1000,
-              scores,
-            });
-            setSampleCount(samplesRef.current.length);
-            setFaceStatus("Expression estimates active");
-          } else setFaceStatus("Looking for your face…");
+          if (face?.emotion?.length && ctx) {
+            const [x, y, width, height] = face.box;
+            ctx.drawImage(video, x, y, width, height, 0, 0, 64, 64);
+            const quality = faceQuality(ctx.getImageData(0, 0, 64, 64).data, 64, 64, { ...face, mesh: face.mesh.map((point) => [point[0], point[1]]) }, video.videoWidth, video.videoHeight);
+            if (quality.quality >= 0.5) {
+              const current: ExpressionSample = {
+                at: (Date.now() - startRef.current) / 1000,
+                scores: Object.fromEntries(face.emotion.map((e) => [e.emotion, e.score])),
+                quality: quality.quality, model: "human/default-emotion",
+              };
+              const sample = smoothExpressions(previous, current);
+              previous = sample;
+              samplesRef.current.push(sample);
+              setSampleCount(samplesRef.current.length);
+              setFaceStatus("Expression estimates active");
+            } else { previous = undefined; setFaceStatus(quality.reason); }
+          } else { previous = undefined; setFaceStatus("Looking for your face…"); }
         }
         await new Promise((r) => setTimeout(r, 1800));
       }
     } catch {
-      if (mounted.current && activeRef.current)
+      if (mounted.current && activeRef.current && session === generation.current)
         setFaceStatus(
           "Expression model unavailable. Your recording can continue.",
         );
@@ -147,10 +151,12 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
       );
       return;
     }
+    const session = ++generation.current;
     setLoading(true);
     setError("");
     samplesRef.current = [];
     energiesRef.current = [];
+    acousticRef.current = [];
     setSampleCount(0);
     setSeconds(0);
     try {
@@ -170,7 +176,7 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
         audio: mode !== "writing",
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      if (!mounted.current) {
+      if (!mounted.current || session !== generation.current) {
         stream.getTracks().forEach((t) => t.stop());
         return;
       }
@@ -183,6 +189,7 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play().catch(() => {});
       }
+      if (!activeRef.current || session !== generation.current) return;
       if (mode !== "writing") {
         const recordStream =
           mode === "voice" ? new MediaStream(stream.getAudioTracks()) : stream;
@@ -227,15 +234,17 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
         const context = new AudioContext();
         contextRef.current = context;
         const analyser = context.createAnalyser();
-        analyser.fftSize = 256;
+        analyser.fftSize = 2048;
+        await context.resume().catch(() => {});
+        if (!activeRef.current || session !== generation.current) return;
         context.createMediaStreamSource(stream).connect(analyser);
-        const data = new Uint8Array(analyser.fftSize);
+        const data = new Float32Array(analyser.fftSize);
         intervalRef.current = setInterval(() => {
           if (!activeRef.current) return;
-          analyser.getByteTimeDomainData(data);
-          const rms = Math.sqrt(
-            data.reduce((s, x) => s + ((x - 128) / 128) ** 2, 0) / data.length,
-          );
+          analyser.getFloatTimeDomainData(data);
+          const sample = acousticSample(data, context.sampleRate, (Date.now() - startRef.current) / 1000);
+          acousticRef.current.push(sample);
+          const rms = sample.rms;
           energiesRef.current.push(rms);
           setLevel(Math.min(1, rms * 6));
           const duration = Math.floor((Date.now() - startRef.current) / 1000);
@@ -246,47 +255,46 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
             );
             stop();
           }
-        }, 150);
-        if (transcribe && speechSupported) {
-          const Constructor =
-            (window as SpeechWindow).SpeechRecognition ||
-            (window as SpeechWindow).webkitSpeechRecognition!;
-          const recognition = new Constructor();
-          recognitionRef.current = recognition;
-          recognition.continuous = true;
-          recognition.interimResults = false;
-          recognition.lang = "en-US";
-          recognition.onresult = (e) => {
-            for (let i = e.resultIndex; i < e.results.length; i++)
-              if (e.results[i].isFinal)
-                transcriptRef.current(e.results[i][0].transcript);
-          };
-          recognition.onerror = (e) => {
-            if (e.error === "no-speech") return;
-            recognition.onend = null;
-            if (mounted.current)
-              setError(
-                `Live transcription is unavailable (${e.error}). Your recording continues; you can add a transcript below.`,
-              );
-          };
-          recognition.onend = () => {
-            if (activeRef.current)
-              try {
-                recognition.start();
-              } catch {
-                /* The recording remains available if recognition cannot restart. */
+        }, 250);
+        if (transcribe) {
+          const status = await speechAvailability();
+          if (!activeRef.current || session !== generation.current) return;
+          const recognition = status === "available" ? localRecognition() : null;
+          if (!recognition) {
+            setSpeechStatus(status);
+            setError("On-device transcription is unavailable. Your recording continues; add a transcript below.");
+          } else {
+            recognitionRef.current = recognition;
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            let passageStart = (Date.now() - startRef.current) / 1000;
+            const current = () => activeRef.current && mounted.current && session === generation.current;
+            recognition.onspeechstart = () => { passageStart = (Date.now() - startRef.current) / 1000; };
+            recognition.onresult = (e) => {
+              if (!current()) return;
+              const text: string[] = [];
+              for (let i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) text.push(e.results[i][0].transcript.trim());
+              if (text.some(Boolean)) {
+                const end = (Date.now() - startRef.current) / 1000;
+                transcriptRef.current({ id: crypto.randomUUID(), start: Math.min(passageStart, end), end, text: text.join(" "), timing: "approximate" });
+                passageStart = end;
               }
-          };
-          try {
-            recognition.start();
-          } catch {
-            setError(
-              "Live transcription could not start. Add or paste a transcript below.",
-            );
+            };
+            recognition.onerror = (e) => {
+              if (e.error === "no-speech") return;
+              recognition.onend = null;
+              if (current()) setError(`On-device transcription is unavailable (${e.error}). Your recording continues; add a transcript below.`);
+            };
+            recognition.onend = () => {
+              if (current()) try { passageStart = (Date.now() - startRef.current) / 1000; recognition.start(); }
+              catch { setError("On-device transcription stopped. Your recording continues; add a transcript below."); }
+            };
+            try { recognition.start(); }
+            catch { setError("On-device transcription could not start. Add or paste a transcript below."); }
           }
         }
       }
-      if (camera) void trackExpressions();
+      if (camera && activeRef.current && session === generation.current) void trackExpressions(session);
       else
         setFaceStatus(
           mode === "video"
@@ -294,7 +302,9 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
             : "Camera off",
         );
     } catch (e) {
+      if (!mounted.current || session !== generation.current) return;
       activeRef.current = false;
+      if (recorderRef.current?.state === "recording") recorderRef.current.stop();
       release();
       setLoading(false);
       setActive(false);
@@ -309,10 +319,12 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
     }
   }
   function reset() {
+    generation.current++;
     setBlob(null);
     setSeconds(0);
     samplesRef.current = [];
     energiesRef.current = [];
+    acousticRef.current = [];
     setSampleCount(0);
     setError("");
   }
@@ -327,9 +339,12 @@ export function useCapture(mode: Mode, onTranscript: (text: string) => void) {
     level,
     sampleCount,
     speechSupported,
+    speechStatus,
+    installSpeech,
     start,
     stop,
     reset,
+    getAcoustics: () => [...acousticRef.current],
     getExpressions: () => [...samplesRef.current],
     getVoiceEnergy: () => {
       const values = energiesRef.current;

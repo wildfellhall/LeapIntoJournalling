@@ -19,7 +19,6 @@ from scipy.special import expit
 
 ROOT = Path(__file__).resolve().parents[1]
 LABELS = ["anger", "disgust", "fear", "joy", "sadness", "surprise", "neutral"]
-VERSION = "goemotions-linear-1"
 REVISION = "2adf640a14f11025ae5a9d0ec493b78530d276d3"
 
 
@@ -53,7 +52,11 @@ def metrics(actual, predicted):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=Path, required=True)
+    parser.add_argument("--journal-augment", action="store_true")
+    parser.add_argument("--output", type=Path, default=ROOT / "experiments/text-candidate")
     args = parser.parse_args()
+    args.output.mkdir(parents=True, exist_ok=True)
+    version = "goemotions-journal-linear-2" if args.journal_augment else "goemotions-linear-1"
     source_labels = (args.data / "emotions.txt").read_text().splitlines()
     mapping = json.loads((args.data / "ekman_mapping.json").read_text())
     mapping["neutral"] = ["neutral"]
@@ -73,6 +76,16 @@ def main():
     train, y_train = read("train")
     dev, y_dev = read("dev")
     test, y_test = read("test")
+    if args.journal_augment:
+        authored = json.loads((ROOT / "scripts/fixtures/journal-training.json").read_text())["examples"]
+        for split, texts in [("train", train), ("dev", dev)]:
+            selected = [row for row in authored if row["split"] == split]
+            # Modest repeated weight for journal phrasing; no private journal data.
+            selected *= 4 if split == "train" else 1
+            target = np.array([[int(label in row["labels"]) for label in LABELS] for row in selected])
+            texts.extend(row["text"] for row in selected)
+            if split == "train": y_train = np.concatenate([y_train, target])
+            else: y_dev = np.concatenate([y_dev, target])
     frequency = Counter()
     for text in train:
         frequency.update(set(features(text)))
@@ -136,32 +149,32 @@ def main():
                 best = max(best, (f, float(threshold)))
         thresholds.append(round(best[1], 2))
 
-    model = {"version": VERSION, "labels": LABELS, "scale": 256, "thresholds": thresholds,
+    model = {"version": version, "labels": LABELS, "scale": 256, "thresholds": thresholds,
              "bias": quantized[-1].tolist(),
              "terms": {term: [float(idf[i]), *quantized[i].tolist()] for i, term in enumerate(vocab)}}
     payload = json.dumps(model, separators=(",", ":")).encode()
-    destination = ROOT / "src/lib/emotion-model.json"
+    destination = args.output / "emotion-model.json"
     destination.write_bytes(payload)
     test_scores = expit(x_test @ weights)
     evaluation = {
-        "version": VERSION, "dataset": "Google Research GoEmotions, official Ekman mapping",
-        "revision": REVISION, "trainExamples": len(train), "validationExamples": len(dev), "testExamples": len(test),
+        "version": version, "dataset": "Google Research GoEmotions, official Ekman mapping",
+        "revision": REVISION, "journalExamples": {"train": 28, "dev": 14, "trainingWeight": 4} if args.journal_augment else None, "trainExamples": len(train), "validationExamples": len(dev), "testExamples": len(test),
         "features": len(vocab), "bytes": len(payload), "gzipBytes": len(gzip.compress(payload, mtime=0)),
         "thresholds": dict(zip(LABELS, thresholds)),
         "validation": metrics(y_dev, dev_scores >= thresholds),
         "test": metrics(y_test, test_scores >= thresholds),
-        "notes": "Held-out Reddit comment metrics, not journal accuracy. Single-segment classifier only; app segmentation/abstention is tested separately. Test data is not used for vocabulary, training, or thresholds.",
+        "notes": "Held-out Reddit comment metrics, not journal accuracy. Single-segment classifier only; app segmentation/abstention is tested separately. Test data is not used for vocabulary, training, or thresholds. Authored synthetic journal training/dev examples are not human validation.",
         "sha256": {name: hashlib.sha256((args.data / name).read_bytes()).hexdigest()
                    for name in ["train.tsv", "dev.tsv", "test.tsv", "emotions.txt", "ekman_mapping.json"]},
     }
     (ROOT / "docs").mkdir(exist_ok=True)
-    (ROOT / "docs/emotion-evaluation.json").write_text(json.dumps(evaluation, indent=2) + "\n")
+    (args.output / "evaluation.json").write_text(json.dumps(evaluation, indent=2) + "\n")
     # Cross-language parity fixtures verify the JS feature extraction and inference.
     examples = ["I feel happy and grateful.", "I am angry and frustrated.", "I am sad and lonely.",
                 "I am afraid and nervous.", "That is disgusting and gross.", "Wow, what a surprise!",
                 "I don't feel happy.", "I filed the document."]
     fixture = [{"text": text, "scores": scores.tolist()} for text, scores in zip(examples, expit(matrix(examples) @ weights))]
-    (ROOT / "scripts/emotion-parity.json").write_text(json.dumps(fixture, indent=2) + "\n")
+    (args.output / "parity.json").write_text(json.dumps(fixture, indent=2) + "\n")
     print(json.dumps(evaluation, indent=2))
 
 

@@ -1,3 +1,5 @@
+import type { TranscriptPassage } from "../lib/types";
+import { joinPassages } from "../lib/signals";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
@@ -113,9 +115,11 @@ export function Editor({
   const [recordingUrl, setRecordingUrl] = useState("");
   const [selectedStickerId, selectSticker] = useState<string | null>(null);
   const savedRef = useRef(false);
-  const capture = useCapture(mode, (text) =>
-    setDraft((d) => ({ ...d, text: d.text + (d.text ? " " : "") + text })),
-  );
+  const passages = useRef<TranscriptPassage[]>([]);
+  const capture = useCapture(mode, (passage) => {
+    passages.current.push(passage);
+    setDraft((d) => ({ ...d, text: d.text + (d.text ? " " : "") + passage.text }));
+  });
   const set = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
   const decorate = (patch: Partial<Decoration>) =>
     setDraft((d) => ({ ...d, decoration: { ...d.decoration, ...patch } }));
@@ -203,6 +207,8 @@ export function Editor({
         recording: capture.blob || undefined,
         duration: capture.seconds || undefined,
         voiceEnergy: capture.getVoiceEnergy(),
+        acoustics: capture.getAcoustics(),
+        transcript: passages.current.length ? { passages: [...passages.current], text: joinPassages(passages.current) } : undefined,
       };
       await onSave(entry);
       savedRef.current = true;
@@ -675,9 +681,10 @@ export function Editor({
                 </label>
                 <p className="small-note">
                   {capture.speechSupported
-                    ? "Opt-in: your browser may send audio to its speech service. English transcription; edit it before saving."
-                    : "Live transcription is not supported here. You can add a transcript manually."}
+                    ? "English transcription runs on this device. Review the transcript after recording; timing is approximate."
+                    : capture.speechStatus === "downloadable" ? "Local English transcription needs a browser language pack. Its size is controlled by your browser; nothing downloads automatically." : capture.speechStatus === "downloading" ? "Your browser is installing the English speech pack…" : "On-device transcription is unavailable here. Add a transcript manually."}
                 </p>
+                {capture.speechStatus === "downloadable" && <button className="secondary" disabled={capture.active || capture.loading} onClick={() => void capture.installSpeech()}>Install English speech pack</button>}
               </>
             )}
           </section>
@@ -728,6 +735,7 @@ export function Editor({
               className="primary"
               onClick={() => {
                 capture.reset();
+                passages.current = [];
                 set({ text: "" });
                 setConfirmRedo(false);
               }}

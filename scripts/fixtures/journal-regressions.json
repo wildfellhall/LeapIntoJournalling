@@ -1,0 +1,227 @@
+[
+  {
+    "id": "self-joy",
+    "text": "I am delighted about my new apartment.",
+    "labels": [
+      "joy"
+    ]
+  },
+  {
+    "id": "self-sad",
+    "text": "I feel despondent tonight.",
+    "labels": [
+      "sadness"
+    ]
+  },
+  {
+    "id": "self-anger",
+    "text": "I am livid after being ignored.",
+    "labels": [
+      "anger"
+    ]
+  },
+  {
+    "id": "self-fear",
+    "text": "I feel apprehensive about the appointment.",
+    "labels": [
+      "fear"
+    ]
+  },
+  {
+    "id": "self-disgust",
+    "text": "I am revolted by what I saw.",
+    "labels": [
+      "disgust"
+    ]
+  },
+  {
+    "id": "self-surprise",
+    "text": "I'm astonished by the result.",
+    "labels": [
+      "surprise"
+    ]
+  },
+  {
+    "id": "mixed",
+    "text": "I am happy and sad.",
+    "labels": [
+      "joy",
+      "sadness"
+    ]
+  },
+  {
+    "id": "contrast",
+    "text": "I was angry yesterday but I am grateful today.",
+    "labels": [
+      "anger",
+      "joy"
+    ]
+  },
+  {
+    "id": "negation",
+    "text": "I am not happy.",
+    "labels": []
+  },
+  {
+    "id": "negation-contrast",
+    "text": "I am not sad. I feel hopeful.",
+    "labels": [
+      "joy"
+    ]
+  },
+  {
+    "id": "other",
+    "text": "My friend is sad and lonely.",
+    "labels": []
+  },
+  {
+    "id": "other-pronoun",
+    "text": "She is furious about the meeting.",
+    "labels": []
+  },
+  {
+    "id": "other-self",
+    "text": "She is terrified but I feel relieved.",
+    "labels": [
+      "joy"
+    ]
+  },
+  {
+    "id": "reported-quotation",
+    "text": "My friend said, \"I am angry.\"",
+    "labels": []
+  },
+  {
+    "id": "quotation",
+    "text": "\"I am so happy,\" the character said.",
+    "labels": []
+  },
+  {
+    "id": "hypothetical",
+    "text": "If I were happy I would go out.",
+    "labels": []
+  },
+  {
+    "id": "wish",
+    "text": "I wish I felt happy.",
+    "labels": []
+  },
+  {
+    "id": "anticipated",
+    "text": "I might be scared tomorrow.",
+    "labels": []
+  },
+  {
+    "id": "sarcasm",
+    "text": "Yeah right, I am so happy about another delay.",
+    "labels": []
+  },
+  {
+    "id": "factual",
+    "text": "I watered the plants before going to work.",
+    "labels": []
+  },
+  {
+    "id": "unsupported",
+    "text": "\u4eca\u5929\u6211\u5f88\u5f00\u5fc3",
+    "labels": []
+  },
+  {
+    "id": "empty",
+    "text": "",
+    "labels": []
+  },
+  {
+    "id": "past",
+    "text": "I felt heartbroken last week.",
+    "labels": [
+      "sadness"
+    ]
+  },
+  {
+    "id": "present",
+    "text": "I feel joyful now.",
+    "labels": [
+      "joy"
+    ]
+  },
+  {
+    "id": "two-subjects",
+    "text": "I am happy and she is sad.",
+    "labels": [
+      "joy"
+    ]
+  },
+  {
+    "id": "uncertain",
+    "text": "I have several thoughts about the day.",
+    "labels": []
+  },
+  {
+    "id": "idiom",
+    "text": "I keep smiling thinking about the picnic.",
+    "labels": [
+      "joy"
+    ]
+  },
+  {
+    "id": "indirect-grief",
+    "text": "The house feels empty since the goodbye.",
+    "labels": [
+      "sadness"
+    ]
+  },
+  {
+    "id": "indirect-fear",
+    "text": "My stomach tightened before the exam.",
+    "labels": [
+      "fear"
+    ]
+  },
+  {
+    "id": "indirect-anger",
+    "text": "Being talked over again made my blood boil.",
+    "labels": [
+      "anger"
+    ]
+  },
+  {
+    "id": "subtle-mixed",
+    "text": "The move is a fresh start but I miss my old home.",
+    "labels": [
+      "joy",
+      "sadness"
+    ]
+  },
+  {
+    "id": "unmarked-sarcasm",
+    "text": "Wonderful, another missed train and a two-hour wait.",
+    "labels": []
+  },
+  {
+    "id": "idiom-negation",
+    "text": "I cannot wait for the celebration.",
+    "labels": [
+      "joy"
+    ]
+  },
+  {
+    "id": "reported-first-person",
+    "text": "I could tell my friend was heartbroken.",
+    "labels": []
+  },
+  {
+    "id": "double-negative",
+    "text": "I am not unhappy today.",
+    "labels": [
+      "joy"
+    ]
+  },
+  {
+    "id": "sparse",
+    "text": "I went to the store. I made lunch. I washed the dishes. I feel sad.",
+    "labels": [
+      "sadness"
+    ]
+  }
+]

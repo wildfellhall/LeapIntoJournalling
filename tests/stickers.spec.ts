@@ -94,7 +94,7 @@ test("stickers move and resize, survive drafts and saves, and round-trip through
     .click();
   const path = (await (await download).path())!;
   const backup = JSON.parse(await readFile(path, "utf8"));
-  expect(backup.version).toBe(2);
+  expect(backup.version).toBe(3);
   expect(backup.entries[0].decoration.stickers[0]).toMatchObject({
     emoji: "🌼",
     size: 100,

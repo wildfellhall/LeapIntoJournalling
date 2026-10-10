@@ -1,3 +1,4 @@
+import { EntrySignals } from "./components/EntrySignals";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowDownToLine,
@@ -614,6 +615,11 @@ export default function App() {
       {selected && (
         <EntryDetail
           entry={selected}
+          onUpdate={async (updated) => {
+            await saveEntries([updated]);
+            await refresh();
+            setSelected(updated);
+          }}
           onClose={() => setSelected(null)}
           onDelete={async () => {
             await deleteEntry(selected.id);
@@ -695,8 +701,8 @@ export default function App() {
               choose to enable it.
             </li>
             <li>
-              Expression analysis runs here. Optional live transcription may use
-              your browser’s speech service.
+              Expression analysis and supported live transcription run on this device.
+              Manual transcripts work in every browser.
             </li>
             <li>
               Text emotions use a small English classifier on this device.
@@ -767,11 +773,14 @@ function EntryDetail({
   entry,
   onClose,
   onDelete,
+  onUpdate,
 }: {
   entry: Entry;
   onClose: () => void;
   onDelete: () => Promise<void>;
+  onUpdate: (entry: Entry) => Promise<void>;
 }) {
+  const playback = useRef<HTMLMediaElement | null>(null);
   const [url, setUrl] = useState(""),
     [confirm, setConfirm] = useState(false),
     [busy, setBusy] = useState(false),
@@ -813,9 +822,9 @@ function EntryDetail({
       </div>
       {url &&
         (entry.mode === "video" ? (
-          <video src={url} controls className="detail-video" />
+          <video ref={(node) => { playback.current = node; }} src={url} controls className="detail-video" />
         ) : (
-          <audio src={url} controls className="detail-audio" />
+          <audio ref={(node) => { playback.current = node; }} src={url} controls className="detail-audio" />
         ))}
       {entry.prompt && (
         <blockquote className="detail-prompt">{entry.prompt}</blockquote>
@@ -850,6 +859,9 @@ function EntryDetail({
           </span>
         )}
       </div>
+      <EntrySignals entry={entry} onUpdate={onUpdate} onSeek={(seconds) => {
+        if (playback.current) { playback.current.currentTime = seconds; void playback.current.play().catch(() => {}); }
+      }} />
       <details className="analysis-details">
         <summary>Explore this entry’s signals</summary>
         <p>Estimated text emotions: <strong>{emotionDescription(entry.analysis)}</strong>.</p>

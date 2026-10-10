@@ -1,4 +1,4 @@
-import type { EmotionStatus } from "./emotions";
+import type { Emotion, EmotionEvidence, EmotionStatus } from "./emotions";
 export type Mode = "writing" | "video" | "voice";
 export type Mood = "joyful" | "calm" | "reflective" | "low" | "overwhelmed";
 export const moods: {
@@ -29,6 +29,26 @@ export const moods: {
 export interface ExpressionSample {
   at: number;
   scores: Record<string, number>;
+  rawScores?: Record<string, number>;
+  quality?: number;
+  model?: string;
+}
+export interface TranscriptPassage {
+  id: string;
+  start: number;
+  end: number;
+  text: string;
+  // Native speech recognition supplies event timing, not word timestamps.
+  timing: "approximate";
+}
+export interface AcousticSample {
+  at: number;
+  rms: number;
+  pitchHz: number | null;
+  periodicity: number;
+  zeroCrossingRate: number;
+  clipping: number;
+  quality: number;
 }
 export interface Analysis {
   score: number;
@@ -36,6 +56,7 @@ export interface Analysis {
   keywords: string[];
   emotions: Record<string, number>;
   emotionStatus?: EmotionStatus;
+  evidence?: EmotionEvidence;
   polarity?: { positive: number; negative: number; neutral: number };
   method: "local-lexicon" | "local-vader" | "local-vader-emotion";
   version?: string;
@@ -70,6 +91,9 @@ export interface Entry {
   prompt?: string;
   duration?: number;
   voiceEnergy?: { average: number; peak: number; samples: number };
+  acoustics?: AcousticSample[];
+  transcript?: { passages: TranscriptPassage[]; text: string };
+  emotionCorrection?: { labels: Emotion[]; updatedAt: string };
   recording?: Blob;
   demo?: boolean;
 }

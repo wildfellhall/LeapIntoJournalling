@@ -4058,3 +4058,18 @@ button.primary:hover:not(:disabled) {
 .prompt-flower {
   color: #f0e7d1;
 }
+
+.entry-signals { margin: 24px 0; padding: 22px; border: 1px solid var(--border, #dfe5d9); border-radius: 18px; background: #f7faf5; display: grid; gap: 12px; }
+.entry-signals > p { margin: 0; }
+.entry-signals > button { justify-self: start; }
+.emotion-review, .transcript-review { border: 1px solid #dbe6d8; border-radius: 14px; padding: 16px; min-width: 0; }
+.emotion-options, .signal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.emotion-option { border: 1px solid #d5ded1; border-radius: 20px; background: #fff; padding: 8px 14px; }
+.emotion-option.selected { background: #ddfeea; border-color: #759881; }
+.signal-evidence summary { cursor: pointer; padding: 8px 0; }
+.passage-list { list-style: none; padding: 0; max-height: 320px; overflow-y: auto; }
+.passage-list li { display: grid; gap: 5px; padding: 12px 0; border-bottom: 1px solid #e2e8de; overflow-wrap: anywhere; }
+.passage-list .text-button { text-align: left; justify-self: start; }
+.transcript-review textarea { width: 100%; min-height: 110px; padding: 12px; margin: 8px 0; border: 1px solid #d5ded1; border-radius: 10px; background: white; resize: vertical; font: inherit; }
+.transcript-passage { display: grid; }
+@media (max-width: 600px) { .entry-signals { padding: 15px; } }

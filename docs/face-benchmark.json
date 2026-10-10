@@ -1,0 +1,205 @@
+{
+  "browser": "Chrome / local WebGL",
+  "candidateRevision": "bc66dc53bac03c96d35a7e6daaf717e72f3985f5",
+  "productionCandidateEnabled": false,
+  "limitations": "Timing and loading smoke test on an unlabeled library screenshot unless a separate manifest is supplied. No expression-accuracy claim. Quality thresholds are heuristics; no occlusion guarantee. Real lighting, angles, skin tones, cameras and repeated subjects need evaluation before changing the production model.",
+  "fixtures": [
+    {
+      "id": 0,
+      "label": null,
+      "subject": "unlabeled-package-fixture",
+      "condition": "screenshot-smoke-test",
+      "sha256": "f5310f98bc9d6db7f1d4073b323ded78969b30941de24f48fb1579c7d9ce6e58"
+    }
+  ],
+  "artifacts": [
+    {
+      "file": "affectnet-mobilenet.json",
+      "bytes": 47205,
+      "sha256": "e7401bcc60145832f3d8eb9b8d801d160177720b9a8fe021a3a1caa753d3c390"
+    },
+    {
+      "file": "affectnet-mobilenet.bin",
+      "bytes": 6920630,
+      "sha256": "15cbdb86210598b6c21fe5b42a8007cf00d0298dfdfba8b9f1ac0a75a8621244"
+    }
+  ],
+  "results": [
+    {
+      "name": "default",
+      "loadMs": 18.699999999254942,
+      "observations": [
+        {
+          "id": 0,
+          "run": 0,
+          "ms": 35.79999999888241,
+          "detected": true,
+          "quality": 0.91,
+          "label": null,
+          "subject": "unlabeled-package-fixture",
+          "condition": "screenshot-smoke-test",
+          "emotions": [
+            {
+              "score": 0.92,
+              "emotion": "happy"
+            }
+          ]
+        },
+        {
+          "id": 0,
+          "run": 1,
+          "ms": 30.700000001117587,
+          "detected": true,
+          "quality": 0.91,
+          "label": null,
+          "subject": "unlabeled-package-fixture",
+          "condition": "screenshot-smoke-test",
+          "emotions": [
+            {
+              "score": 0.92,
+              "emotion": "happy"
+            }
+          ]
+        },
+        {
+          "id": 0,
+          "run": 2,
+          "ms": 26.5,
+          "detected": true,
+          "quality": 0.91,
+          "label": null,
+          "subject": "unlabeled-package-fixture",
+          "condition": "screenshot-smoke-test",
+          "emotions": [
+            {
+              "score": 0.92,
+              "emotion": "happy"
+            }
+          ]
+        },
+        {
+          "id": 0,
+          "run": 3,
+          "ms": 30.799999998882413,
+          "detected": true,
+          "quality": 0.91,
+          "label": null,
+          "subject": "unlabeled-package-fixture",
+          "condition": "screenshot-smoke-test",
+          "emotions": [
+            {
+              "score": 0.92,
+              "emotion": "happy"
+            }
+          ]
+        },
+        {
+          "id": 0,
+          "run": 4,
+          "ms": 31,
+          "detected": true,
+          "quality": 0.91,
+          "label": null,
+          "subject": "unlabeled-package-fixture",
+          "condition": "screenshot-smoke-test",
+          "emotions": [
+            {
+              "score": 0.92,
+              "emotion": "happy"
+            }
+          ]
+        }
+      ],
+      "medianMs": 30.799999998882413,
+      "p95Ms": 31
+    },
+    {
+      "name": "affectnet-mobilenet",
+      "loadMs": 99.59999999962747,
+      "observations": [
+        {
+          "id": 0,
+          "run": 0,
+          "ms": 40.80000000074506,
+          "detected": true,
+          "quality": 0.91,
+          "label": null,
+          "subject": "unlabeled-package-fixture",
+          "condition": "screenshot-smoke-test",
+          "emotions": [
+            {
+              "score": 0.98,
+              "emotion": "happy"
+            }
+          ]
+        },
+        {
+          "id": 0,
+          "run": 1,
+          "ms": 31.5,
+          "detected": true,
+          "quality": 0.91,
+          "label": null,
+          "subject": "unlabeled-package-fixture",
+          "condition": "screenshot-smoke-test",
+          "emotions": [
+            {
+              "score": 0.98,
+              "emotion": "happy"
+            }
+          ]
+        },
+        {
+          "id": 0,
+          "run": 2,
+          "ms": 30.600000001490116,
+          "detected": true,
+          "quality": 0.91,
+          "label": null,
+          "subject": "unlabeled-package-fixture",
+          "condition": "screenshot-smoke-test",
+          "emotions": [
+            {
+              "score": 0.98,
+              "emotion": "happy"
+            }
+          ]
+        },
+        {
+          "id": 0,
+          "run": 3,
+          "ms": 30.600000001490116,
+          "detected": true,
+          "quality": 0.91,
+          "label": null,
+          "subject": "unlabeled-package-fixture",
+          "condition": "screenshot-smoke-test",
+          "emotions": [
+            {
+              "score": 0.98,
+              "emotion": "happy"
+            }
+          ]
+        },
+        {
+          "id": 0,
+          "run": 4,
+          "ms": 30.09999999962747,
+          "detected": true,
+          "quality": 0.91,
+          "label": null,
+          "subject": "unlabeled-package-fixture",
+          "condition": "screenshot-smoke-test",
+          "emotions": [
+            {
+              "score": 0.98,
+              "emotion": "happy"
+            }
+          ]
+        }
+      ],
+      "medianMs": 30.600000001490116,
+      "p95Ms": 31.5
+    }
+  ]
+}

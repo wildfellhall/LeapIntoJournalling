@@ -1,6 +1,6 @@
 # Leap Into Journalling
 
-Journal that allows users to create their entries through writing, voice, or video. 
+A browser-based journal for writing, voice, and video, with on-device emotion estimates, editable emotion labels, connected-entry graphs, and downloadable insights reports. Journal entries and recordings are stored locally in your browser.
 
 ## Screenshots
 
@@ -29,24 +29,52 @@ Open the URL printed by Vite (normally `http://127.0.0.1:5173`). Camera and micr
 ```sh
 npm run build       # Typecheck and create dist/
 npm run preview     # Preview the production build
-npm test           # Analysis, prompts, and IndexedDB tests
+npm test            # Analysis, media measurements, corrections, and storage tests
 npx playwright test # With the dev server running; uses installed Google Chrome
 ```
 
 Browser tests use synthetic camera/microphone input and isolated browser profiles. They never open your real camera or microphone. For another Chromium install, change `launchOptions.channel` in `playwright.config.ts`.
 
+The latest implementation passed 55 unit tests, 23 browser tests, and the production build. Seven browser checks also passed against the compiled static site. These checks verify application behavior; model accuracy and its limitations are documented in the [evaluation notes](docs/multimodal-evaluation.md).
+
+## Vercel deployment
+
+The repository is configured for a static Vite deployment through [`vercel.json`](vercel.json):
+
+| Setting | Value |
+| --- | --- |
+| Node.js | 22.x |
+| Install command | `npm ci` |
+| Build command | `npm run build` |
+| Output directory | `dist` |
+
+No API keys, server functions, Python environment, or model training are required for deployment. The existing text weights ship with the app, and the camera models are copied from the installed dependency during the build and loaded when camera analysis is enabled. Experimental model weights and evaluation datasets are excluded from the production output.
+
+Localhost and a deployed site have separate browser storage. Use **Settings & your data** to export a backup and restore it on the other site.
+
 ## Included
 
-- Writing journal with four fonts, four paper colors, page highlighting, removable stickers, sticky notes, mood check-ins, entry dates, and debounced text draft autosave.
+- Writing journal with four fonts, four paper colors, page highlighting, movable and resizable stickers with white borders, sticky notes, mood check-ins, entry dates, and debounced text draft autosave.
 - Video and voice recording, up to ten minutes per entry, with playback, duration, downloadable recordings, and editable transcripts. Unsaved recording navigation prompts prevent accidental loss.
 - 120 writing prompts and 520 shared video/voice prompts, built from curated subjects and reflection frames. Shuffle avoids immediately repeating the same prompt.
 - Optional camera expression estimates in every mode. Voice mode saves only the audio track. Writing mode saves expression measurements, not camera footage.
-- Optional live English transcription where the browser supports Web Speech recognition. It is off by default; the interface explains that the browser may send audio to its speech service. Manual transcripts work in every mode.
+- Optional **on-device-only** English transcription. Supported browsers must provide local recognition; cloud-capable legacy recognition is never used as a fallback. Browser language packs require an explicit installation click. Native passages retain approximate recording times and can be reviewed after saving; manual transcripts work everywhere.
 - IndexedDB stores entry text, decoration, sentiment, expression samples, acoustic measurements, and recording blobs atomically. Search, mode/mood filters, entry details, and confirmed deletion are included.
-- Full JSON backup and restore include recordings. Restore validates all records before committing and merges by ID. Individual recordings can also be downloaded.
+- Local emotion review supports several labels or confirmed none, with corrections applied to charts, graph connections, and reports.
+- Full JSON backup and restore include recordings, corrections, timed passages and acoustic measurements. Version 3 backups retain compatibility with versions 1 and 2. Restore validates all records before committing and merges by ID. Individual recordings can also be downloaded.
 - A responsive, keyboard-operable graph with date lookup, entry selection, zoom, shared keywords, and ranked matches. A maximum of 30 nodes is displayed around the selected entry; all entries remain selectable and participate in ranking.
 - Daily mood and text-emotion charts, self-reported mood distribution, word counts by mood and emotion, recurring keywords, and date filters.
 - An explicitly labeled sample journal that never enters personal storage or backups.
+
+## Review an entry’s emotions and transcript
+
+1. Save an entry, then open it from your journal.
+2. Select **Review emotion labels**. Choose any combination of joy, sadness, anger, fear, disgust, and surprise, or **Clear all** to confirm that none fits.
+3. Select **Save emotion labels**. Your choices take priority in Insights, Connections, and PDF reports. To remove a correction, reopen the review and select **Use automatic estimates**.
+
+**Text evidence** shows the passages supporting the automatic labels, their coverage, and any excluded passages. Coverage and model strength describe evidence in the writing; they are not probabilities of how you feel.
+
+For voice and video entries, **Review transcript** lets you correct saved text and recomputes its automatic analysis on this device. Captured speech passages include approximate playback times. **Signals by passage** compares available text and facial estimates without treating disagreements as a single emotion. Manual or freely edited transcripts can still be analyzed, but timing comparisons are disabled when they no longer match the recorded passages. User-confirmed emotion labels remain in place when a transcript is edited.
 
 ## How the signals work
 
@@ -54,15 +82,15 @@ On **Insights**, choose a date range and select **Download report** to create an
 
 Text sentiment runs entirely on the device using [VADER](https://github.com/cjhutto/vaderSentiment), through the zero-dependency [`vader-sentiment`](https://github.com/nimaeskandary/vaderSentiment-js) JavaScript package (pinned to 1.1.3). Its larger lexicon and rules account for intensifiers, negation, capitalization, punctuation, emoticons, and contrast with “but.” Leap normalizes curly apostrophes and common negation patterns, scores each sentence separately, and averages scores by word count. Very long sentences are processed in chunks of 400 words without truncating the entry. The dictionary and algorithm ship with the static app; no neural model weights, external sentiment requests, API keys, or server functions are needed.
 
-Specific **text emotions** use a separate compact, multi-label linear classifier trained on the public [GoEmotions dataset](https://github.com/google-research/google-research/tree/master/goemotions). It estimates **joy, sadness, anger, fear, disgust, and surprise**, using Google's broad Ekman grouping. Its weights are about **221 KB compressed**; inference is plain TypeScript with no extra runtime dependency, model service, or build-time training. Sentence-level processing preserves mixed emotions, with a small rule layer recognizing explicit statements such as “I am angry” or “I feel happy and sad.” Conservative thresholds, evidence checks, and negation masking leave uncertain text unlabeled. This is a small model with limited recall, not the large RoBERTa GoEmotions model. See the [model documentation, limitations, and reproducible evaluation](docs/emotion-model.md).
+Specific **text emotions** use a separate compact, multi-label linear classifier trained on the public [GoEmotions dataset](https://github.com/google-research/google-research/tree/master/goemotions). It estimates **joy, sadness, anger, fear, disgust, and surprise**, using Google's broad Ekman grouping. Its weights are about **221 KB compressed**; inference is plain TypeScript with no extra runtime dependency, model service, or build-time training. Passage-level processing preserves mixed emotions, tags past/current/anticipated language, and excludes recognized quotations, hypothetical statements, sarcasm cues, and other-person descriptions, with a small rule layer recognizing explicit statements such as “I am angry” or “I feel happy and sad.” Conservative thresholds, evidence checks, and negation masking leave uncertain text unlabeled. This is a small model with limited recall, not the large RoBERTa GoEmotions model. See the [model documentation, limitations, and reproducible evaluation](docs/emotion-model.md).
 
-Existing entries are reanalyzed locally when loaded, and imported backups are reanalyzed from their original text; text, recordings, and mood check-ins are preserved. The method and version accompany saved estimates. `analysis.emotions` contains specific emotion profile weights; VADER's positive/negative/neutral proportions live separately in `analysis.polarity`. Neither is a probability of someone's actual feelings. Mood check-ins take precedence in the mood timeline. Text-emotion charts count entries with each label, including writing and saved voice/video transcripts; mixed entries can count in multiple categories. PDFs include the same emotion counts and average words.
+Existing entries are reanalyzed locally when loaded, and imported backups are reanalyzed from their original text; text, recordings, and mood check-ins are preserved. The method and version accompany saved estimates. `analysis.emotions` contains specific emotion profile weights; VADER's positive/negative/neutral proportions live separately in `analysis.polarity`. Neither is a probability of someone's actual feelings. `analysis.evidence` separately records evidence-word coverage, raw model/rule strength and a conservative reliability weight. User-confirmed labels override the text profile without changing the saved automatic analysis. Mood check-ins take precedence in the mood timeline. Text-emotion charts count entries with each label, including writing and saved voice/video transcripts; mixed entries can count in multiple categories. PDFs include the same emotion counts and average words, with separate counts for user labels and automatic estimates.
 
-Connections combine TF–IDF word similarity (65%) with cosine similarity of specific text-emotion profiles (35%). When both entries have mood check-ins, the emotion component averages profile similarity and check-in proximity; if only check-ins are available, it uses those. When both entries contain facial samples, expression similarity contributes 10%, leaving 25% for the emotion component. Missing signals are omitted and remaining weights renormalized. Empty/uncertain text is not assigned a matching neutral emotion. Graph colors can show the strongest text emotion or a mood check-in.
+Connections compare TF–IDF word similarity and emotion profiles. Sparse text evidence has less influence; mood check-ins and user corrections take priority. Expression similarity can contribute up to 10% only when quality-checked samples overlap a timed transcript passage, have a sufficiently strong expression score, and agree with its text labels. Conflicting estimates remain visible in the passage review but do not influence ranking. Text and its transcript are the same source, never two votes. Editing text outside timed passages disables alignment. Untimed legacy facial samples remain viewable but no longer influence connections. Node colors can show the strongest emotion label or a mood check-in.
 
-Facial-expression inference uses [`@vladmandic/human`](https://github.com/vladmandic/human). Only the face detector and emotion model are enabled; age, gender, identity, body, and hand models are disabled. The build copies the required model files into `public/models/`, so journal data never goes to a model CDN. See the [upstream model credits](https://github.com/vladmandic/human/wiki/Models). The JS model bundle loads only after the user enables camera analysis. Expression predictions can be wrong and do not establish someone's emotional state.
+Facial-expression inference uses [`@vladmandic/human`](https://github.com/vladmandic/human). Only the face detector and emotion model are enabled; age, gender, identity, body, and hand models are disabled. The build copies the required model files into `public/models/`, so journal data never goes to a model CDN. See the [upstream model credits](https://github.com/vladmandic/human/wiki/Models). The JS model bundle loads only after the user enables camera analysis. Samples are rejected for poor lighting, blur, framing, detector confidence, or rough landmark-based pose; these checks cannot guarantee detection of every obstruction. A short exponential smoother resets after bad frames or a five-second gap. Raw and smoothed scores are retained. Expression predictions can be wrong and do not establish someone's emotional state.
 
-Voice energy is measured with Web Audio RMS and retained as an acoustic observation. It is **not** labeled as emotional sentiment or used as such in the graph. A validated voice-emotion classifier is not included. The transcript and optional camera estimates provide the requested emotional inputs for spoken entries.
+Voice uses Web Audio for RMS, pitch/periodicity, zero-crossing rate, clipping and approximate unvoiced-frame share. These are acoustic observations, not emotion labels. A tiny vocal-emotion pilot was tested on a bounded public dataset and failed to demonstrate sufficient accuracy, so no voice-emotion model is bundled or enabled. The existing text model also outperformed an authored journal-style retraining candidate on the held-out benchmark; the candidate was not promoted. An optional AffectNet model was tested for loading and latency only and remains outside the app. See [evaluation results and reproduction commands](docs/multimodal-evaluation.md).
 
 ## Privacy and storage limits
 
@@ -70,8 +98,8 @@ Voice energy is measured with Web Audio RMS and retained as an acoustic observat
 - Data is not encrypted. Anyone with access to this browser profile may access the journal. Backups are also unencrypted.
 - Clearing site data or browser storage eviction can remove entries. Download backups regularly. Imports are limited to 100 MB; media storage depends on the browser's quota.
 - Text drafts autosave locally. Media recordings remain in memory until **Complete entry**; reloading or closing the tab can lose an unsaved recording even if a browser warning appears.
-- Browser speech recognition availability, network requirements, and privacy behavior vary. See [MDN's SpeechRecognition documentation](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition). A manual transcript is always available.
-- Automated checks cover Chrome with synthetic media, local model loading, storage persistence, backups, failure recovery, and mobile layout. Real speech-service accuracy, real facial-expression accuracy, and other browsers require device testing.
+- Native local speech recognition is experimental and browser-dependent. Leap requires [`processLocally`](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/processLocally), checks local pack availability, and never silently falls back to remote recognition. Installing a browser language pack can require a network download; the browser controls its size. Manual transcripts remain available.
+- Automated checks cover Chrome with synthetic media, local model loading, storage persistence, backups, failure recovery, and mobile layout. Real local-speech accuracy, facial-expression accuracy, and other browsers require device testing.
 
 ## Project layout
 
