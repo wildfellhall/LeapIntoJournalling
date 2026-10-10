@@ -2,6 +2,18 @@
 
 Journal that allows users to create their entries through writing, voice, or video. 
 
+## Screenshots
+
+Screenshots use fictional journal entries.
+
+| Home | Writing editor |
+| --- | --- |
+| ![Journal home with entry formats, mood check-in, prompts, and recent entries](docs/screenshots/home.png) | ![Writing editor with a handwritten entry, sticker, sticky note, and mood selection](docs/screenshots/writing.png) |
+
+| Connections | Insights |
+| --- | --- |
+| ![Entry similarity graph with date lookup and related entries](docs/screenshots/connections.png) | ![Insights with mood trends, word counts, recurring keywords, and the PDF report download button](docs/screenshots/insights.png) |
+
 ## Run locally
 
 Use Node.js 22 LTS and npm. `.nvmrc` and `package.json` select the same Node major version for local development and Vercel builds.
