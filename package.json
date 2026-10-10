@@ -1,0 +1,36 @@
+{
+  "name": "leap-into-journalling",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "prepare:models": "node scripts/copy-models.mjs",
+    "predev": "npm run prepare:models",
+    "prebuild": "npm run prepare:models"
+  },
+  "dependencies": {
+    "@fontsource/caveat": "^5.2.6",
+    "@fontsource/dm-sans": "^5.2.6",
+    "@fontsource/lora": "^5.2.6",
+    "@vladmandic/human": "^3.3.6",
+    "lucide-react": "^0.468.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "recharts": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.5.0",
+    "fake-indexeddb": "^6.0.0",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^4.1.11",
+    "@playwright/test": "^1.51.0"
+  }
+}
