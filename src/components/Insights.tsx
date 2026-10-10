@@ -145,8 +145,9 @@ export function Insights({
                 </div>
                 <span className="tiny-tag">Daily average</span>
               </div>
-              <div
+              {timeline.some((day) => day.value !== null) ? <div
                 className="chart-wrap"
+                role="img"
                 aria-label="Line chart of daily mood scores"
               >
                 <ResponsiveContainer width="100%" height="100%">
@@ -203,7 +204,7 @@ export function Insights({
                     />
                   </AreaChart>
                 </ResponsiveContainer>
-              </div>
+              </div> : <div className="chart-empty">Add a mood check-in, writing, or a transcript to see this timeline.</div>}
               <p className="small-note">
                 Uses your mood check-in, or text tone when no mood was selected.
                 Entries without either are unscored.
@@ -213,7 +214,7 @@ export function Insights({
               <h3>Mood distribution</h3>
               {checkins ? (
                 <>
-                  <div className="donut-wrap">
+                  <div className="donut-wrap" role="img" aria-label="Distribution of mood check-ins">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
@@ -264,7 +265,7 @@ export function Insights({
               <p>Average word count per entry</p>
               {wordMoods.length ? (
                 <>
-                  <div className="chart-wrap short">
+                  <div className="chart-wrap short" role="img" aria-label="Average word counts by mood check-in">
                     <ResponsiveContainer width="100%" height="100%">
                       <ScatterChart
                         margin={{ top: 20, right: 25, left: 0, bottom: 10 }}

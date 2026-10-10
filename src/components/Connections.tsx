@@ -1,5 +1,5 @@
 import { entryEmotions, entryEmotionDescription } from "../lib/signals";
-import { useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   Network,
@@ -26,7 +26,26 @@ export function Connections({
     [notice, setNotice] = useState(""),
     [zoom, setZoom] = useState(1);
   const [colorBy, setColorBy] = useState("emotion");
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const previousZoom = useRef(1);
+  useLayoutEffect(() => {
+    const viewport = viewportRef.current;
+    if (viewport) {
+      const ratio = zoom / previousZoom.current;
+      viewport.scrollLeft = (viewport.scrollLeft + viewport.clientWidth / 2) * ratio - viewport.clientWidth / 2;
+      viewport.scrollTop = (viewport.scrollTop + viewport.clientHeight / 2) * ratio - viewport.clientHeight / 2;
+    }
+    previousZoom.current = zoom;
+  }, [zoom]);
   const selected = entries.find((e) => e.id === selectedId) || entries[0];
+  useEffect(() => {
+    if ((selected?.id ?? "") !== selectedId) {
+      setSelectedId(selected?.id ?? "");
+      setDate(selected?.date ?? "");
+      setNotice("");
+      setZoom(1);
+    }
+  }, [selected, selectedId]);
   const index = useMemo(() => createConnectionIndex(entries), [entries]);
   const ranked = useMemo(() => selected ? index.rank(selected) : [], [selected, index]);
   const nodes = useMemo(() => {
@@ -49,10 +68,16 @@ export function Connections({
       return true;
     });
   }, [nodes, index]);
+  function selectEntry(entry: Entry) {
+    setSelectedId(entry.id);
+    setDate(entry.date);
+    setNotice("");
+    setZoom(1);
+  }
   function find() {
     const matches = entries.filter((e) => e.date === date);
     if (matches.length) {
-      setSelectedId(matches[0].id);
+      selectEntry(matches[0]);
       setNotice(
         matches.length > 1
           ? `${matches.length} entries on this day. Choose one below.`
@@ -106,9 +131,7 @@ export function Connections({
                 aria-label="Choose an entry to connect"
                 value={selected?.id}
                 onChange={(e) => {
-                  setSelectedId(e.target.value);
-                  setDate(entries.find((x) => x.id === e.target.value)!.date);
-                  setNotice("");
+                  selectEntry(entries.find((x) => x.id === e.target.value)!);
                 }}
               >
                 {entries.map((e) => (
@@ -129,7 +152,7 @@ export function Connections({
               <div className="graph-header">
                 <div>
                   <h3>Related entries</h3>
-                  <p>Lines require shared content. Closer entries have more in common.</p>
+                  <p>Lines show shared topics in writing or transcripts.</p>
                 </div>
                 <span className="tiny-tag">
                   {ranked.length} content {ranked.length === 1 ? "match" : "matches"}
@@ -139,10 +162,11 @@ export function Connections({
                   <option value="mood">Mood check-in</option>
                 </select>
               </div>
-              <div className="graph-canvas">
+              <div className="graph-canvas" ref={viewportRef} tabIndex={0} role="group" aria-label="Scrollable journal connections">
                 <svg
                   viewBox="0 0 740 480"
-                  role="img"
+                  style={{ width: `${zoom * 100}%`, height: `calc(var(--graph-height) * ${zoom})` }}
+                  role="group"
                   aria-label="Interactive graph of journal entry relationships"
                 >
                   <defs>
@@ -158,9 +182,7 @@ export function Connections({
                     </pattern>
                   </defs>
                   <rect width="740" height="480" fill="url(#dots)" />
-                  <g
-                    transform={`translate(370 240) scale(${zoom}) translate(-370 -240)`}
-                  >
+                  <g>
                     {nodes.slice(1).map((node, i) => {
                       const r = ranked[i];
                       return (
@@ -171,7 +193,11 @@ export function Connections({
                           x2={node.x}
                           y2={node.y}
                           stroke="#86b49a"
-                          strokeWidth={1 + r.score * 3}
+                          strokeWidth={1.5 + r.content * 2}
+                          vectorEffect="non-scaling-stroke"
+                          className="connection-edge"
+                          data-source={selected.id}
+                          data-target={node.entry.id}
                         >
                           <title>
                             Shared topics: {r.shared.slice(0, 4).join(", ")}
@@ -180,7 +206,7 @@ export function Connections({
                       );
                     })}
                     {crossLinks.map(({ a, b, match }) => (
-                      <line key={a.entry.id + b.entry.id} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#d5e1d6" strokeWidth="1.5" strokeDasharray="4 5">
+                      <line key={JSON.stringify([a.entry.id, b.entry.id])} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="#aabdad" strokeWidth="1.25" strokeDasharray="4 5" vectorEffect="non-scaling-stroke" className="connection-edge connection-edge-secondary" data-source={a.entry.id} data-target={b.entry.id}>
                         <title>Shared topics: {match.shared.slice(0, 4).join(", ")}</title>
                       </line>
                     ))}
@@ -190,18 +216,17 @@ export function Connections({
                         role="button"
                         tabIndex={0}
                         aria-label={`Connect ${entry.title}`}
-                        onClick={() => {
-                          setSelectedId(entry.id);
-                          setDate(entry.date);
-                        }}
+                        aria-pressed={i === 0}
+                        onFocus={(event) => event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" })}
+                        onClick={() => selectEntry(entry)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" || e.key === " ") {
                             e.preventDefault();
-                            setSelectedId(entry.id);
-                            setDate(entry.date);
+                            selectEntry(entry);
                           }
                         }}
                         className="graph-node"
+                        data-entry-id={entry.id}
                       >
                         <title>
                           {entry.title} · {readableDate(entry.date)} · {entry.emotionCorrection ? "Your labels" : "Text estimate"}: {entryEmotionDescription(entry)}
@@ -226,29 +251,32 @@ export function Connections({
                     ))}
                   </g>
                 </svg>
-                <div className="graph-zoom">
-                  <button
-                    className="icon-button"
-                    aria-label="Zoom in"
-                    onClick={() => setZoom((z) => Math.min(1.6, z + 0.15))}
-                  >
-                    <ZoomIn size={18} />
-                  </button>
-                  <button
-                    className="icon-button"
-                    aria-label="Zoom out"
-                    onClick={() => setZoom((z) => Math.max(0.55, z - 0.15))}
-                  >
-                    <ZoomOut size={18} />
-                  </button>
-                  <button
-                    className="icon-button"
-                    aria-label="Reset graph zoom"
-                    onClick={() => setZoom(1)}
-                  >
-                    <RotateCcw size={16} />
-                  </button>
-                </div>
+              </div>
+              <div className="graph-zoom">
+                {zoom > 1 && <span>Scroll to explore</span>}
+                <button
+                  className="icon-button"
+                  aria-label="Zoom in"
+                  disabled={zoom >= 2}
+                  onClick={() => setZoom((z) => Math.min(2, z + 0.25))}
+                >
+                  <ZoomIn size={18} />
+                </button>
+                <button
+                  className="icon-button"
+                  aria-label="Zoom out"
+                  disabled={zoom <= 1}
+                  onClick={() => setZoom((z) => Math.max(1, z - 0.25))}
+                >
+                  <ZoomOut size={18} />
+                </button>
+                <button
+                  className="icon-button"
+                  aria-label="Reset graph zoom"
+                  onClick={() => setZoom(1)}
+                >
+                  <RotateCcw size={16} />
+                </button>
               </div>
               <div className="graph-legend">
                 {(colorBy === "emotion" ? emotionDefinitions : moods).map((m) => (
@@ -291,6 +319,7 @@ export function Connections({
               {ranked.length > 8 && <p className="small-note">Showing the 8 closest matches. Choose any entry above to explore another part of your journal.</p>}
               <details className="connection-method">
                 <summary>How connections work</summary>
+                <p>Solid lines connect the selected entry; dashed lines connect other matches. Thicker lines indicate more shared content.</p>
                 <p>Shared words, phrases, and common word variants form the links. Titles provide context; writing or a transcript is required. Emotions and check-ins can refine a content match, but cannot create one.</p>
                 <p>Content has at least 80% of the weight; check-ins have at most 5%. Colors show emotion or mood, not the reason for a link. These are text patterns, not causes or clinical findings.</p>
               </details>

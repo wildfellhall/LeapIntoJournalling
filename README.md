@@ -39,7 +39,7 @@ npx playwright test # With the dev server running; uses installed Google Chrome
 
 Browser tests use synthetic camera/microphone input and isolated browser profiles. They never open your real camera or microphone. For another Chromium install, change `launchOptions.channel` in `playwright.config.ts`.
 
-Deployment validation passed 63 unit tests, all 24 browser checks against the production build, and a clean installation/build with Node 22. The dependency audit reported no known vulnerabilities. The UI audit covers the main screens and dialogs at desktop and mobile sizes; see [audit notes](docs/ui-audit.md). These checks verify application behavior; model accuracy and its limitations are documented in the [evaluation notes](docs/multimodal-evaluation.md).
+Deployment validation passed 63 unit tests, all 27 browser checks against the production build, and a clean installation/build with Node 22. The dependency audit reported no known vulnerabilities. The UI audit covers the main screens and dialogs at desktop and mobile sizes; see [audit notes](docs/ui-audit.md). These checks verify application behavior; model accuracy and its limitations are documented in the [evaluation notes](docs/multimodal-evaluation.md).
 
 ## Included
 
@@ -51,7 +51,7 @@ Deployment validation passed 63 unit tests, all 24 browser checks against the pr
 - IndexedDB stores entry text, decoration, sentiment, expression samples, acoustic measurements, and recording blobs atomically. Search, mode/mood filters, entry details, and confirmed deletion are included.
 - Local emotion review supports several labels or confirmed none, with corrections applied to charts, graph connections, and reports.
 - Full JSON backup and restore include recordings, corrections, timed passages and acoustic measurements. Version 3 backups retain compatibility with versions 1 and 2. Restore validates all records before committing and merges by ID. Individual recordings can also be downloaded.
-- A responsive, keyboard-operable graph with date lookup, entry selection, zoom, shared keywords, and ranked matches. The graph shows up to eight content matches around the selected entry; all entries remain selectable and participate in ranking. Expand recurring topics to review supporting entries across at least three distinct days.
+- A responsive, keyboard-operable graph with date lookup, entry selection, zoom, shared keywords, and ranked matches. Scroll or focus nodes to explore while zoomed; selecting an entry fits its connections back into view. The graph shows up to eight content matches around the selected entry; all entries remain selectable and participate in ranking. Expand recurring topics to review supporting entries across at least three distinct days.
 - Daily mood and text-emotion charts, self-reported mood distribution, word counts by mood and emotion, recurring keywords, and date filters.
 - An explicitly labeled sample journal that never enters personal storage or backups.
 

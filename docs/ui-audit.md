@@ -42,15 +42,23 @@ This follows the browser's distinction between available local recognition and d
 ## Validation
 
 - 63 unit tests passed, including unrelated same-mood entries, synonym matching across journal modes, contrasting emotions, copied prompts, missing transcripts, multi-day recurrence, longer sample entries, empty journals, and the strict 5% check-in influence cap.
-- All 24 browser checks passed against the compiled static site. Coverage includes writing, synthetic voice/video capture and playback, local facial-model loading, storage persistence, backups, emotion corrections, download-free transcription behavior, graph connections, stickers, mobile layout, and PDF export/recovery.
+- All 27 browser checks passed against the compiled static site. Coverage includes writing, synthetic voice/video capture and playback, local facial-model loading, storage persistence, backups, emotion corrections, download-free transcription behavior, graph connections, stickers, mobile layout, and PDF export/recovery.
 - PDF checks now import fixtures through the app's restore flow and recognize both development and production asset paths, so the full suite can run against either build.
 - Desktop/mobile captures and explicit page/node bounds checks complement the automated tests. This is a Chrome audit, not a claim of exhaustive testing on every browser, device or assistive technology.
 
 Run `npm test`, `npm run build`, and (with the local server running) `npx playwright test`. For the compiled site, run `npm run preview` and set `PLAYWRIGHT_BASE_URL=http://127.0.0.1:4173` when running browser checks.
 
+## Graph rendering follow-up
+
+- Verified actual SVG marks in all five chart types at 320, 390, 768 and 1440 pixels, including resizing, date filtering, navigation, saved entries after reload, and single-point data. Recordings without text or check-ins now show an explanation instead of empty mood axes.
+- Fixed zoom clipping: the enlarged SVG has a scrollable viewport, keyboard focus brings nodes into view, and selecting an entry fits its connections back into view. Zoom controls sit outside the graph so they cannot cover a node.
+- Connection lines retain their stroke width on small screens. Solid lines indicate connections to the selected entry; dashed lines indicate links among its other matches.
+- Browser checks verify all eight displayed matches, numbered list/node correspondence, exact line endpoints, date lookup, and unrelated-entry exclusion using writing, voice and video transcripts with no mood check-ins. Loading sample data from an empty graph also initializes the date field correctly.
+- Refreshed the README's Connections screenshot from the production preview. The follow-up passed all 63 unit tests, all 27 production browser tests, and the Node 22 production build.
+
 ## Deployment readiness
 
-- A fresh copy of the tracked and pending source files passed `npm ci --offline --no-audit --no-fund` using cached packages, then `npm run build` under Node 22. It did not reuse the working directory's dependencies, generated models, or build output. No new packages or model downloads were needed.
+- The final pre-commit audit used a fresh copy of all 87 tracked and pending files, verified identical to the working tree. It passed `npm ci --offline --no-audit --no-fund`, all 63 unit tests, and `npm run build` under Node 22; all 27 browser tests then passed against that copy's own production preview. It did not reuse the working directory's dependencies, generated models, or build output. No new packages or model downloads were needed.
 - The manifest and lockfile agree. `npm audit` reported zero known vulnerabilities across production and development dependencies at audit time.
 - `vercel.json` selects Vite, `npm ci`, `npm run build`, and `dist`, with the SPA fallback matching [Vercel's Vite guidance](https://vercel.com/docs/frameworks/frontend/vite#using-vite-to-make-spas). Node 22 is pinned in both `.nvmrc` and `package.json` and is a [supported Vercel version](https://vercel.com/docs/functions/runtimes/node-js/node-js-versions).
 - Both facial-model manifests resolve to locally copied weights in the build; entry-point assets and documentation links resolve. Static output is approximately 7.1 MiB; PDF and camera-analysis code remain loaded on demand. No API keys, backend service, or build-time training is required.
