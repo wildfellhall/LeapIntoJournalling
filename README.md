@@ -23,26 +23,6 @@ npx playwright test # With the dev server running; uses installed Google Chrome
 
 Browser tests use synthetic camera/microphone input and isolated browser profiles. They never open your real camera or microphone. For another Chromium install, change `launchOptions.channel` in `playwright.config.ts`.
 
-## Deploy to Vercel
-
-1. Open [New Project in Vercel](https://vercel.com/new) and import the private GitHub repository `wildfellhall/LeapIntoJournalling`. Grant Vercel access to that repository if it is not listed.
-2. Keep the root directory at the repository root (`./`) and select the `main` production branch. The checked-in `vercel.json` supplies these settings:
-
-   | Setting | Value |
-   | --- | --- |
-   | Framework preset | Vite |
-   | Install command | `npm ci` |
-   | Build command | `npm run build` |
-   | Output directory | `dist` |
-   | Node.js version | 22.x (from `package.json`) |
-   | Environment variables | None required |
-
-3. Click **Deploy**. The prebuild step copies the local expression models from the installed dependency into the production assets automatically. Fonts and illustrations are also included in the build.
-
-The SPA rewrite follows [Vercel's Vite guidance](https://vercel.com/docs/frameworks/frontend/vite#using-vite-to-make-spas). The app currently selects its pages in memory, so refreshing returns to Your space. No server functions, database provisioning, API keys, or hosting plugins are needed.
-
-After deployment, use the app's HTTPS URL for camera and microphone access. Journal storage is specific to each origin: export a backup from localhost, then restore it on the deployed URL to move your entries. A private GitHub repository does not make the deployed app private; configure Vercel's deployment protection if needed.
-
 ## Included
 
 - Writing journal with four fonts, four paper colors, page highlighting, removable stickers, sticky notes, mood check-ins, entry dates, and debounced text draft autosave.
