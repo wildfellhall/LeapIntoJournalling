@@ -2,7 +2,7 @@
 
 A browser-based journal for writing, voice, and video, with on-device emotion estimates, editable emotion labels, connected-entry graphs, and downloadable insights reports. 
 
-## Screenshots
+## Demonstration Screenshots
 
 All demonstration screenshots use fictional, sample journal entries.
 
