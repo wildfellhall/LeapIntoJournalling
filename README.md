@@ -86,8 +86,6 @@ Voice uses Web Audio for RMS, pitch/periodicity, zero-crossing rate, clipping an
 ## Privacy and storage limits
 
 - No journal backend, analytics, cloud sync, or accounts. This browser's origin is the storage boundary; local development and a hosted version have separate journals. Use backup/restore to move data.
-- Data is not encrypted. Anyone with access to this browser profile may access the journal. Backups are also unencrypted.
-- Clearing site data or browser storage eviction can remove entries. Download backups regularly. Imports are limited to 100 MB; media storage depends on the browser's quota.
 - Text drafts autosave locally. Media recordings remain in memory until **Complete entry**; reloading or closing the tab can lose an unsaved recording even if a browser warning appears.
 - Native local speech recognition is experimental and browser-dependent. Leap requires [`processLocally`](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/processLocally), checks local pack availability, and never silently falls back to remote recognition. No speech-pack installation or model-download flow is offered. If a browser needs a pack or cannot guarantee on-device recognition, live transcription stays unavailable and the user can type or paste a transcript. Automatic transcription without an already-available local service would require a cloud service; it is not enabled.
 - Automated checks cover Chrome with synthetic media, local model loading, storage persistence, backups, failure recovery, and mobile layout. Real local-speech accuracy, facial-expression accuracy, and other browsers require device testing.
