@@ -4,7 +4,7 @@ A browser-based journal for writing, voice, and video, with on-device emotion es
 
 ## Screenshots
 
-Screenshots use fictional, sample journal entries.
+All demonstration screenshots use fictional, sample journal entries.
 
 | Home | Writing editor |
 | --- | --- |
