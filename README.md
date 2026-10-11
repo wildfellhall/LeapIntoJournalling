@@ -43,7 +43,7 @@ Deployment validation passed 63 unit tests, all 27 browser checks against the pr
 
 ## Included
 
-- Writing journal with four fonts, four paper colors, page highlighting, movable and resizable stickers with white borders, sticky notes, mood check-ins, entry dates, and debounced text draft autosave.
+- Writing journal with four fonts, four paper colors, page highlighting, movable and resizable emoji stickers with white borders, sticky notes, mood check-ins, entry dates, and debounced text draft autosave.
 - Video and voice recording, up to ten minutes per entry, with playback, duration, downloadable recordings, and editable transcripts. Unsaved recording navigation prompts prevent accidental loss.
 - 120 writing prompts and 520 shared video/voice prompts, built from curated subjects and reflection frames. Shuffle avoids immediately repeating the same prompt.
 - Optional camera expression estimates in every mode. Voice mode saves only the audio track. Writing mode saves expression measurements, not camera footage.
